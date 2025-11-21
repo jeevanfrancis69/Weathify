@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weathify - Music for the Moment</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles to enhance the aesthetic and responsiveness */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* Dark background for a modern, 'app-like' feel */
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .header-gradient {
+            /* Subtle background gradient for the main content area */
+            background: linear-gradient(135deg, #1f2937 0%, #0d1117 100%);
+        }
+        .intriguing-design {
+            /* Centered card or hero section for the main message */
+            max-width: 90%;
+            width: 1200px;
+            min-height: 80vh;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .intriguing-design:hover {
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+        }
+        /* Style for the "Weathify" logo/name */
+        .logo-text {
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(90deg, #60a5fa, #8b5cf6); /* Blue-Purple Gradient */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        /* Custom button styling for a modern, glowing effect */
+        .glow-button {
+            position: relative;
+            overflow: hidden;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+        .glow-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        .glow-button:hover::before {
+            left: 100%;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Main Container Card -->
+    <div class="intriguing-design rounded-3xl p-6 md:p-10 flex flex-col">
+
+        <!-- Header/Navigation Bar -->
+        <header class="flex justify-between items-center pb-8 border-b border-gray-700">
+            <!-- Website Name (Top Left) -->
+            <div class="text-3xl sm:text-4xl font-extrabold">
+                <span class="logo-text">Weathify</span>
+            </div>
+
+            <!-- Login/Sign Up Buttons (Top Right) -->
+            <div class="flex space-x-3 md:space-x-4">
+                <button class="glow-button bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-full shadow-lg shadow-blue-500/50 transition duration-300 transform hover:scale-105" onclick="window.location.href='login.html'">
+                    Log In
+                </button>
+                <button class="glow-button bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold py-2 px-4 rounded-full border border-gray-600 transition duration-300 transform hover:scale-105" onclick="window.location.href='signup.html'">
+                    Sign Up
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area (Hero Section) -->
+        <main class="flex-grow flex flex-col justify-center items-center text-center p-6 md:p-12">
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight">
+                Music Tuned to Your <span class="text-blue-400">Moment</span>.
+            </h1>
+            <p class="text-lg sm:text-xl text-gray-400 max-w-3xl mb-10">
+                Stop scrolling. Weathify suggests the perfect soundtrack for your current weather, season, and time of day, delivering contextual music recommendations without the privacy hassle.
+            </p>
+
+            <!-- Call to Action -->
+            <button class="glow-button bg-purple-600 hover:bg-purple-700 text-white text-xl font-bold py-4 px-8 rounded-full shadow-xl shadow-purple-500/50 transition duration-300 transform hover:scale-105" onclick="alertPlaceholder('Explore Music clicked')">
+                Explore The Music
+            </button>
+
+            <!-- Small Feature Highlights (Responsive Grid) -->
+            <div class="mt-16 w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                <!-- Feature 1: Weather -->
+                <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-blue-500 transition duration-300">
+                    <span class="text-2xl mb-3 block text-blue-400">🌧️</span>
+                    <h3 class="text-xl font-semibold mb-2">Weather Match</h3>
+                    <p class="text-gray-400 text-sm">Playlists curated for sunny days, rainy nights, and everything in between.</p>
+                </div>
+                <!-- Feature 2: Season -->
+                <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-purple-500 transition duration-300">
+                    <span class="text-2xl mb-3 block text-purple-400">🍂</span>
+                    <h3 class="text-xl font-semibold mb-2">Seasonal Vibes</h3>
+                    <p class="text-gray-400 text-sm">From summer anthems to cozy winter tunes, we set the seasonal mood.</p>
+                </div>
+                <!-- Feature 3: Time of Day -->
+                <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-green-500 transition duration-300">
+                    <span class="text-2xl mb-3 block text-green-400">🌅</span>
+                    <h3 class="text-xl font-semibold mb-2">Temporal Flow</h3>
+                    <p class="text-gray-400 text-sm">Perfect tracks for your morning commute, afternoon focus, or late-night session.</p>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer for copyright/links (optional, but good practice) -->
+        <footer class="pt-6 mt-6 border-t border-gray-800 text-center text-gray-500 text-xs">
+            &copy; 2025 Weathify Team Project. All rights reserved.
+        </footer>
+
+    </div>
+
+    <div id="message-box" class="fixed bottom-4 right-4 bg-gray-900 border border-gray-700 text-white p-4 rounded-lg shadow-2xl transition-opacity duration-500 opacity-0 pointer-events-none"></div>
+
+    <script>
+        // Placeholder function retained for the "Explore The Music" button
+        function alertPlaceholder(message) {
+            const msgBox = document.getElementById('message-box');
+            msgBox.textContent = `Action triggered: ${message}`;
+            msgBox.style.opacity = '1';
+            msgBox.style.pointerEvents = 'auto';
+
+            setTimeout(() => {
+                msgBox.style.opacity = '0';
+                msgBox.style.pointerEvents = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
