@@ -3,255 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weathify - Log In</title>
-    <!-- Load Tailwind CSS -->
+    <title>Log In - Weathify</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Use Inter font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* Custom styles for consistency and dark mode */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0d1117; /* Dark background */
-            color: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
+            background-color: #050505;
         }
-        .login-card {
-            max-width: 420px;
-            width: 90%;
-            background-color: #161b22; /* Slightly lighter dark background for the card */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            animation: fadeIn 0.5s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .logo-text {
-            font-weight: 800;
-            letter-spacing: -1px;
-            background: linear-gradient(90deg, #60a5fa, #8b5cf6); /* Blue-Purple Gradient */
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        input[type="email"], input[type="password"] {
-            background-color: #0d1117;
-            border: 1px solid #30363d;
-            color: #ffffff;
-            transition: border-color 0.2s;
-        }
-        input[type="email"]:focus, input[type="password"]:focus {
-            border-color: #60a5fa;
-            box-shadow: 0 0 0 1px #60a5fa;
+        .glass-card {
+            background: rgba(15, 15, 15, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
     </style>
 </head>
-<body>
+<body class="text-white selection:bg-violet-500/30 h-screen overflow-hidden flex flex-col">
 
-    <!-- Login Card -->
-    <div id="login-card" class="login-card rounded-2xl p-8 space-y-6">
-        
-        <h1 class="text-4xl text-center font-extrabold mb-2">
-            <span class="logo-text">Weathify</span>
-        </h1>
-        <p class="text-center text-gray-400">Sign in to get personalized music suggestions.</p>
+    <!-- Background Glow Effects -->
+    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-violet-600/10 blur-[130px] rounded-full pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-0 w-[500px] h-[500px] bg-blue-600/5 blur-[120px] rounded-full pointer-events-none z-0"></div>
 
-        <form id="login-form" class="space-y-4">
-            
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-400 mb-1">Email Address</label>
-                <input type="email" id="email" name="email" required
-                       class="w-full px-4 py-2 rounded-lg focus:outline-none"
-                       placeholder="you@example.com">
+    <!-- Minimal Navbar -->
+    <nav class="w-full z-50 py-6 absolute top-0">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+            <a href="mainpage.html" class="text-2xl font-bold tracking-tight text-white flex items-center gap-2 hover:opacity-90 transition-opacity">
+                <i data-lucide="cloud-rain" class="w-6 h-6 text-violet-400"></i>
+                Weathify
+            </a>
+            <a href="mainpage.html" class="text-sm font-medium text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                Back to Home
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="relative z-10 flex-1 flex items-center justify-center p-6">
+        <div class="w-full max-w-md glass-card rounded-2xl p-8 md:p-10 shadow-2xl animate-fade-in-up">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold mb-2">Welcome Back</h1>
+                <p class="text-gray-400 text-sm">Enter your credentials to access your account</p>
             </div>
 
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-400 mb-1">Password</label>
-                <input type="password" id="password" name="password" required
-                       class="w-full px-4 py-2 rounded-lg focus:outline-none"
-                       placeholder="••••••••">
+            <form class="space-y-5">
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                    <div class="relative">
+                        <i data-lucide="mail" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"></i>
+                        <input type="email" placeholder="hello@example.com" class="w-full bg-[#0A0A0A] border border-white/10 rounded-lg py-3 pl-12 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all">
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"></i>
+                        <input type="password" placeholder="••••••••" class="w-full bg-[#0A0A0A] border border-white/10 rounded-lg py-3 pl-12 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all">
+                    </div>
+                    <div class="flex justify-end mt-2">
+                        <a href="#" class="text-xs text-violet-400 hover:text-violet-300 transition-colors">Forgot Password?</a>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="button" class="w-full py-3.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-lg font-semibold text-white shadow-lg shadow-violet-900/20 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-white/10 text-center">
+                <p class="text-sm text-gray-400">
+                    Don't have an account? 
+                    <a href="signup.html" class="text-violet-400 hover:text-white font-medium transition-colors">Sign up</a>
+                </p>
             </div>
+        </div>
+    </main>
 
-            <button type="submit" id="login-button"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-200 transform hover:scale-[1.02] disabled:opacity-50"
-                    disabled>
-                Log In
-            </button>
-        </form>
-
-        <p class="text-center text-sm text-gray-500">
-            Don't have an account? 
-            <a href="signup.html" class="text-blue-400 hover:text-blue-300 font-medium transition duration-200">Sign Up</a>
-        </p>
-
-        <!-- Message/Error Display Area -->
-        <div id="status-message" class="text-center text-sm p-3 rounded-lg hidden"></div>
-        
-    </div>
-
-    <!-- Firebase Initialization and Logic -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
-        // --- Global Variables and Configuration ---
-        setLogLevel('Debug');
-        
-        // Ensure global variables are accessible (provided by the Canvas environment)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
-        let app = null;
-        let auth = null;
-        let db = null;
-        
-        const loginForm = document.getElementById('login-form');
-        const loginButton = document.getElementById('login-button');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const statusMessage = document.getElementById('status-message');
-
-        // --- Utility Functions ---
-
-        function displayMessage(message, isError = false) {
-            statusMessage.textContent = message;
-            statusMessage.className = isError 
-                ? 'text-red-400 bg-red-900/50 text-center text-sm p-3 rounded-lg'
-                : 'text-green-400 bg-green-900/50 text-center text-sm p-3 rounded-lg';
-            statusMessage.classList.remove('hidden');
-        }
-
-        function toggleLoading(isLoading) {
-            loginButton.disabled = isLoading;
-            loginButton.textContent = isLoading ? 'Logging In...' : 'Log In';
-        }
-
-        function validateForm() {
-            const emailValid = emailInput.value.length > 0 && emailInput.checkValidity();
-            const passwordValid = passwordInput.value.length >= 6; // Firebase minimum password length
-            loginButton.disabled = !(emailValid && passwordValid);
-        }
-
-        // --- Firebase Initialization and Auth ---
-
-        async function initializeFirebase() {
-            if (!firebaseConfig) {
-                console.error("Firebase configuration is missing.");
-                displayMessage("Configuration error: Cannot connect to services.", true);
-                return;
-            }
-            
-            try {
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-
-                // Set persistence to session (optional, but good for web apps)
-                await setPersistence(auth, browserSessionPersistence);
-                
-                // Sign in with custom token if available (Canvas environment) or anonymously
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                    console.log("Signed in with custom token.");
-                } else {
-                    await signInAnonymously(auth);
-                    console.log("Signed in anonymously.");
-                }
-
-                // Listener for authentication state changes
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        console.log("Auth state changed. User is logged in.", user.uid);
-                        // Optional: Redirect authenticated users away from the login page
-                        // For this example, we'll just log the success.
-                    } else {
-                        console.log("Auth state changed. User is logged out.");
-                    }
-                });
-
-                // Enable the login button after initialization
-                validateForm(); 
-
-            } catch (error) {
-                console.error("Firebase initialization or auth error:", error);
-                displayMessage(`Initialization failed: ${error.message}`, true);
-            }
-        }
-
-        // --- Login Action ---
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            if (!auth) {
-                displayMessage("Authentication service not ready. Please try again.", true);
-                return;
-            }
-
-            const email = emailInput.value;
-            const password = passwordInput.value;
-            
-            toggleLoading(true);
-
-            try {
-                // Firebase Login
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                
-                // Success
-                const user = userCredential.user;
-                displayMessage(`Success! Welcome back, ${user.email}. Redirecting...`, false);
-                console.log("User successfully logged in:", user.uid);
-                
-                // In a real application, you would redirect to the main app page here.
-                // window.location.href = 'index.html'; 
-
-            } catch (error) {
-                // Failure
-                let errorMessage = "An unknown error occurred.";
-                console.error("Login failed:", error.code, error.message);
-                
-                // Map Firebase error codes to user-friendly messages
-                switch (error.code) {
-                    case 'auth/user-not-found':
-                    case 'auth/wrong-password':
-                    case 'auth/invalid-credential':
-                        errorMessage = "Invalid email or password.";
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = "The email address format is invalid.";
-                        break;
-                    case 'auth/user-disabled':
-                        errorMessage = "Your account has been disabled.";
-                        break;
-                    default:
-                        errorMessage = "Login failed. Please check your network and credentials.";
-                }
-
-                displayMessage(`Error: ${errorMessage}`, true);
-            } finally {
-                toggleLoading(false);
-            }
-        }
-
-        // --- Event Listeners ---
-
-        // Listen for form submission
-        loginForm.addEventListener('submit', handleLogin);
-        
-        // Listen for input changes to enable/disable button
-        emailInput.addEventListener('input', validateForm);
-        passwordInput.addEventListener('input', validateForm);
-        
-        // Initialize the application
-        initializeFirebase();
-
+    <script>
+        lucide.createIcons();
     </script>
 </body>
 </html>
