@@ -1,0 +1,28 @@
+{
+  "name": "weathify-backend",
+  "version": "1.0.0",
+  "description": "Weathify Backend - Weather-based music recommendation API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "init-db": "node scripts/initDatabase.js",
+    "seed-db": "node scripts/seedDatabase.js"
+  },
+  "keywords": ["music", "weather", "api"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "axios": "^1.6.2",
+    "cookie-parser": "^1.4.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
