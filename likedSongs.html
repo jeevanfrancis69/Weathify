@@ -1,7 +1,165 @@
+<!--Here is the basic html for liked songs. will need updating to make a 
+way for liked songs to actually go to this file im not sure how to do it.-->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <title>Liked Songs</title>
+
+    <style>
+        body {
+            background-color: #0f172a; 
+            color:white;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 24px;
+            border-bottom: 1px solid #334155; 
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin: 0;
+        }
+
+        header p {
+            color: #94a3b8; 
+            margin-top: 6px;
+        }
+
+        main {
+            padding: 24px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .filter {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #cbd5e1; 
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #475569; 
+            background-color: #1e293b; 
+            color: white;
+        }
+
+        .songs-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .card {
+            padding: 16px;
+            background-color: #1e293b; 
+            border-radius: 16px;
+        }
+
+        .card h2 {
+            margin: 0 0 4px 0;
+            font-size: 20px;
+        }
+
+        .card p {
+            margin: 0;
+            color: #94a3b8;
+        }
+
+        .badge {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 4px 8px;
+            font-size: 12px;
+            background-color: #334155;
+            border-radius: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            margin-top: 40px;
+        }
+    </style>
 </head>
+
 <body>
+
+    <header>
+        <h1>Your Liked Songs</h1>
+    </header>
+
+    <main>
+        <div class="filter">
+            <label>Filter by Weather</label>
+            <select>
+                <option>All Weather</option>
+                <option>Sunny</option>
+                <option>Rainy</option>
+                <option>Cloudy</option>
+                <option>Snowy</option>
+                <option>Stormy</option>
+            </select>
+        </div>
+
+        <div id="likedSongsList" class="songs-grid">
+            <!-- Songs get dispalyed here -->
+        </div>
+
+        <div id="emptyState" class="empty-state">
+            <p>You haven't liked any songs yet.</p>
+        </div>
+
+    </main>
+
+    <script>
+        const likedSongs = [ //place liked songs here. Im not sure how this will work with 
+        // the other files so ill add that later.
+            {
+                title: "Thriller",
+                artist: "Michael Jackson",
+                weather: "Stormy"
+            }
+        ];
+
+        const list = document.getElementById("likedSongsList");
+        const emptyState = document.getElementById("emptyState");
+
+        function renderSongs() {
+
+            if (likedSongs.length === 0) {
+                emptyState.style.display = "block";
+                return;
+            }
+
+            emptyState.style.display = "none";
+
+            for (let i = 0; i < likedSongs.length; i++) {
+                const song = likedSongs[i];       // get the current song
+                card = document.createElement("div");
+                card.className = "card";
+
+                card.innerHTML = 
+                    "<h2>" + song.title + "</h2>" +
+                    "<p>" + song.artist + "</p>" +
+                    "<span class='badge'>" + song.weather + "</span>";
+
+                list.appendChild(card);
+            };
+        }
+        renderSongs();
+    </script>
+
 </body>
 </html>
