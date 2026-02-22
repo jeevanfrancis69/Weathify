@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { query } = require('../config/database');
 const { authenticateAdmin } = require('../middleware/auth');
+const xss = require('xss');
 
 // Spotify OAuth Login
 router.get('/spotify', passport.authenticate('spotify', {
@@ -48,10 +49,26 @@ router.post('/admin/login', async (req, res) => {
       return res.status(400).json({ error: 'Username and password required' });
     }
 
+    // Validates input and injection safeguard measures
+
+    if (typeof username !== 'string' || typeof password !== 'string'){
+      return res.status(400).json({error: 'Input must be of TYPE String'});
+
+    }  
+    
+    if (username.length > 50) {
+      return res.status(400).json({error: 'Username entered exceeds max char length' });
+    } else if (password.length > 100) {
+      return res.status(400).json({error: 'Password entered exceeds max char length'});
+    }
+
+    // Protection from XSS and SQL injection attacks
+    const NewUsername = xss(username.trim());
+
     // Find admin
     const result = await query(
       'SELECT * FROM admins WHERE username = $1',
-      [username]
+      [NewUsername]
     );
 
     if (result.rows.length === 0) {
@@ -100,6 +117,34 @@ router.post('/admin/login', async (req, res) => {
   } catch (error) {
     console.error('Admin login error:', error);
     res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+//Password hashing using Bcrypt
+
+router.post('/admin/register' , async (req, res) => {
+
+  try{
+
+    const {username, email, password } = req.body;
+
+    if (!username || !password || !email) {
+      return res.status(400).json({ error: 'We need all fields for hashing to proceed'});
+
+    }
+
+    const hashed_password = await bcrypt.hash(password, 10);
+
+    await query(
+      'INSERT INTO admins (username, email, hashed_password) VALUES ($1, $2, $3)',
+      [username, email, hashed_password]
+    );
+
+    res.json({success: true, message: 'Admin has been successfully created'});
+
+  } catch (error) {
+    res.status(500).json({ error: 'The regestration has failed'});
+
   }
 });
 
