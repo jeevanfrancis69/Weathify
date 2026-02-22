@@ -136,7 +136,7 @@ router.post('/admin/register' , async (req, res) => {
     const hashed_password = await bcrypt.hash(password, 10);
 
     await query(
-      'INSERT INTO admins (username, email, hashed_password) VALUES ($1, $2, $3)',
+      'INSERT INTO admins (username, email, password_hash) VALUES ($1, $2, $3)',
       [username, email, hashed_password]
     );
 
