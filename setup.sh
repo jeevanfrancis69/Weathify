@@ -99,7 +99,7 @@ else
 fi
 
 echo ""
-echo " Setup Complete!"
+echo "🎉 Setup Complete!"
 echo ""
 echo "Next steps:"
 echo "1. Configure your .env file with API credentials"

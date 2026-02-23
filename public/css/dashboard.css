@@ -1,0 +1,328 @@
+/*   DASHBOARD — User-specific styles */
+
+/* Inherits base styles from style.css */
+
+.dashboard-wrap {
+  padding-top: 100px;
+  padding-bottom: 4rem;
+}
+
+.weather-card {
+  background: linear-gradient(135deg,
+    rgba(124, 58, 237, 0.12),
+    rgba(6, 182, 212, 0.08));
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: var(--r-xl);
+  padding: 2rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.weather-card__left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.weather-icon-large {
+  width: 56px;
+  height: 56px;
+  color: var(--purple-400);
+  flex-shrink: 0;
+}
+
+.weather-icon-large svg {
+  width: 100%;
+  height: 100%;
+}
+
+.weather-condition {
+  font-size: 1.75rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  margin-bottom: 0.2rem;
+}
+
+.weather-location {
+  color: var(--text-300);
+  font-size: 0.9rem;
+}
+
+.weather-card__right {
+  text-align: right;
+}
+
+.weather-temp {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--purple-500), var(--cyan-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+.weather-context-badges {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.context-badge {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-300);
+  text-transform: capitalize;
+}
+
+.manual-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.manual-bar__label {
+  font-size: 0.875rem;
+  color: var(--text-400);
+}
+
+.recommendations-header {
+  margin-bottom: 1.5rem;
+}
+
+.rec-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.rec-explanation {
+  color: var(--text-300);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.songs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.25rem;
+}
+
+.loading-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 0;
+  color: var(--text-400);
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--purple-500);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .weather-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .weather-card__right {
+    text-align: left;
+    width: 100%;
+  }
+
+  .weather-context-badges {
+    justify-content: flex-start;
+  }
+
+  .songs-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+.song-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.btn-like,
+.btn-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-300);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: var(--t);
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.btn-like:hover {
+  background: rgba(239,68,84,0.1);
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
+.btn-play:hover {
+  background: rgba(34,197,94,0.1);
+  border-color: #22c55e;
+  color: #86efac;
+}
+
+.btn-like svg,
+.btn-play svg {
+  flex-shrink: 0;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+  color: var(--text-400);
+  font-size: 1rem;
+}
+
+/* ── Like Button States ─────────────────────────────────────── */
+
+.btn-like {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-300);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: var(--t);
+  font-family: inherit;
+}
+
+.btn-like svg {
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.btn-like:hover {
+  background: rgba(239,68,84,0.1);
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
+/* Liked state (after clicking) */
+.btn-like.liked {
+  background: rgba(239,68,84,0.15);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.btn-like.liked svg {
+  fill: #ef4444;
+}
+
+.btn-like.liked:hover {
+  background: rgba(239,68,84,0.25);
+  transform: scale(1.05);
+}
+
+/* ── Remove Button ──────────────────────────────────────────── */
+
+.btn-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-300);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: var(--t);
+  font-family: inherit;
+}
+
+.btn-remove:hover {
+  background: rgba(239,68,68,0.1);
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
+.btn-remove svg {
+  flex-shrink: 0;
+}
+
+/* ── Song Card Meta ─────────────────────────────────────────── */
+
+.song-card__meta {
+  font-size: 0.75rem;
+  color: var(--text-400);
+  margin-top: 0.5rem;
+}
+
+/* ── Card Transitions ───────────────────────────────────────── */
+
+.song-card {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* ── Toast Animations ───────────────────────────────────────── */
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}

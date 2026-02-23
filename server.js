@@ -1,69 +1,87 @@
-const express = require('express');
+const express      = require('express');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
-const helmet = require('helmet');
-const cors = require('cors');
-const rateLimit = require('express-rate-limit');
-const path = require('path');
+const session      = require('express-session');
+const helmet       = require('helmet');
+const cors         = require('cors');
+const rateLimit    = require('express-rate-limit');
+const path         = require('path');
 require('dotenv').config();
 
-const passport = require('./config/passport');
-const authRoutes = require('./routes/auth');
-const recommendationRoutes = require('./routes/recommendations');
-const adminRoutes = require('./routes/admin');
+const authRoutes          = require('./routes/auth');
+const recommendationRoutes= require('./routes/recommendations');
+const adminRoutes         = require('./routes/admin');
 
-const app = express();
+const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// Security middleware
-app.use(helmet({
-  contentSecurityPolicy: false, // Allow inline scripts for frontend
-}));
+// ── 1. Security headers ──────────────────────────────────────
+app.use(helmet({ contentSecurityPolicy: false }));
 
-// CORS configuration
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true,
-}));
+// ── 2. CORS ──────────────────────────────────────────────────
+const ALLOWED_ORIGINS = [
+  'http://127.0.0.1:3000',
+  'http://localhost:3000',
+];
 
-// Rate limiting
+if (process.env.FRONTEND_URL) {
+  ALLOWED_ORIGINS.push(process.env.FRONTEND_URL.replace(/\/$/, ''));
+}
+
+if (process.env.NODE_ENV === 'production' && process.env.FRONTEND_URL) {
+  const cors = require('cors');
+  app.use(cors({
+    origin:      process.env.FRONTEND_URL,
+    credentials: true,
+    methods:     ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }));
+  app.options('*', cors());
+}
+
+// ── 3. Rate limiter (API only) ───────────────────────────────
 const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
-  message: 'Too many requests from this IP, please try again later.',
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000,
+  max:      parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  message:  'Too many requests, please try again later.',
 });
 app.use('/api/', limiter);
 
-// Body parsing middleware
+// ── 4. Body parsers & Cookie parser ──────────────────────────
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Session configuration
+// ── 5. Session ───────────────────────────────────────────────
 app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
+  secret:            process.env.SESSION_SECRET || 'weathify-dev-secret-change-me',
+  resave:            false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
+    // FIX 1: secure:true on http:// causes the browser to silently
+    // discard the cookie entirely. It never gets stored. This is why
+    // Cookies received: [] — the Set-Cookie header is ignored.
+    secure: process.env.NODE_ENV === 'production',
+
+    // FIX 2: 'strict' blocks the cookie on the Spotify→localhost redirect
+    // because that redirect is a cross-site navigation. 'lax' allows it.
+    sameSite: 'lax',
+
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    path: '/',
   },
 }));
 
-// Initialize Passport
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Serve static files from public directory
+// ── 7. Static files ──────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API Routes
+// ── 8. Routes ────────────────────────────────────────────────
 app.use('/auth', authRoutes);
-app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/recommendations', recommendationRoutes);  // handles /api/recommendations/*
+app.use('/api', recommendationRoutes);                  // ALSO mount at /api/* for /api/playlist
 app.use('/api/admin', adminRoutes);
 
-// Health check endpoint
+// Health check
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy', 
@@ -72,26 +90,47 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Serve frontend for all other routes (SPA support)
+// STATIC HTML PAGES — Specific routes for auth pages
+app.get('/login.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.get('/register.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+app.get('/dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+// CATCH-ALL — LAST, for SPA root and 404s
 app.get('*', (req, res) => {
+  // For API routes that weren't matched, return 404 JSON instead of HTML
+  if (req.path.startsWith('/api/') || req.path.startsWith('/auth/')) {
+    return res.status(404).json({ error: 'Route not found' });
+  }
+  
+  // For all other routes, serve index.html
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Error handling middleware
+// ── 10. Error handler ────────────────────────────────────────
 app.use((err, req, res, next) => {
-  console.error('Server error:', err);
+  console.error('[Server Error]', err.message);
   res.status(err.status || 500).json({
     error: err.message || 'Internal server error',
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   });
 });
 
-// Start server
-app.listen(PORT, () => {
+// ── 11. Start server ─────────────────────────────────────────
+// We assign the listener to a variable called 'server' 
+// so we can close it properly later.
+const server = app.listen(PORT, () => {
   console.log(`
   ╔═══════════════════════════════════════╗
   ║                                       ║
-  ║   🎵 Weathify Server Running 🎵      ║
+  ║   🎵 Weathify Server Running 🎵       ║
   ║                                       ║
   ║   Port: ${PORT}                        ║
   ║   Environment: ${process.env.NODE_ENV || 'development'}              ║
@@ -102,8 +141,8 @@ app.listen(PORT, () => {
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received, closing server gracefully...');
-  app.close(() => {
+  console.log('SIGTERM received, closing server...');
+  server.close(() => {
     console.log('Server closed');
     process.exit(0);
   });

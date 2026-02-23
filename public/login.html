@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Weathify</title>
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body class="auth-page">
+
+  <!-- Header -->
+  <header class="auth-header">
+    <a href="/" class="auth-header__logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <path d="M3 9C3 9 4.5 7 7 7C9.5 7 10.5 9 13 9C15.5 9 16.5 7 19 7C21.5 7 22 9 22 9"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M3 14C3 14 4.5 12 7 12C9.5 12 10.5 14 13 14C15.5 14 16.5 12 19 12C21.5 12 22 14 22 14"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Weathify</span>
+    </a>
+  </header>
+
+  <div class="auth-container">
+    <div class="auth-box">
+      <h2 class="auth-title">Welcome Back</h2>
+      <p class="auth-subtitle">Sign in to continue to your dashboard</p>
+
+      <div class="alert alert-error hidden" id="errorMessage"></div>
+
+      <!-- ✓ FORM MUST NOT HAVE action OR method ATTRIBUTES -->
+      <form id="loginForm" class="auth-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            placeholder="Enter your username"
+            autocomplete="username"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+          Sign In
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="/register.html">Create one</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✓ SCRIPT AT THE END OF BODY -->
+  <script src="/js/login.js"></script>
+</body>
+</html>

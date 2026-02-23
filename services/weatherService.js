@@ -65,7 +65,7 @@ class WeatherService {
     };
   }
 
-  // Categorize weather into tags
+  // Categorize weather into predefined tags
   categorizeWeather(main, id) {
     // Weather condition codes: https://openweathermap.org/weather-conditions
     

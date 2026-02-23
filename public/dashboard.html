@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Weathify</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+  <div class="container nav-container">
+    <div class="logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <path d="M3 9C3 9 4.5 7 7 7C9.5 7 10.5 9 13 9C15.5 9 16.5 7 19 7C21.5 7 22 9 22 9"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M3 14C3 14 4.5 12 7 12C9.5 12 10.5 14 13 14C15.5 14 16.5 12 19 12C21.5 12 22 14 22 14"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Weathify</span>
+    </div>
+    <div class="nav-links">
+      <!-- ADD PLAYLIST BUTTON -->
+      <a href="/playlist.html" class="btn btn-outline btn-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M9 18V5L21 3V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="2"/>
+          <circle cx="18" cy="16" r="3" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        Playlist
+      </a>
+      <span class="user-greeting" id="userGreeting">Loading...</span>
+      <button class="btn btn-outline btn-sm" id="logoutBtn">Log Out</button>
+    </div>
+  </div>
+</nav>
+
+  <!-- Main Content -->
+  <div class="dashboard-wrap container">
+
+    <!-- Weather Card -->
+    <div class="weather-card" id="weatherCard">
+      <div class="weather-card__left">
+        <div class="weather-icon-large" id="weatherIconLarge">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M12 2V4M12 20V22M2 12H4M20 12H22
+                     M4.93 4.93L6.34 6.34M17.66 17.66L19.07 19.07
+                     M4.93 19.07L6.34 17.66M17.66 6.34L19.07 4.93"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="weather-condition" id="weatherConditionText">Detecting weather…</div>
+          <div class="weather-location" id="weatherLocationText"></div>
+        </div>
+      </div>
+      <div class="weather-card__right">
+        <div class="weather-temp" id="weatherTempText">—</div>
+        <div class="weather-context-badges" id="weatherContextBadges"></div>
+      </div>
+    </div>
+
+    <!-- Manual Override -->
+    <div class="manual-bar">
+      <span class="manual-bar__label">Not right?</span>
+      <button class="btn btn-outline btn-sm" id="manualWeatherBtn">Set weather manually</button>
+      <button class="btn btn-outline btn-sm" id="refreshBtn">↻ Refresh</button>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="recommendations-header">
+      <h2 class="rec-title">Your Soundtrack</h2>
+      <p class="rec-explanation" id="recExplanation"></p>
+    </div>
+
+    <div class="songs-grid" id="songsGrid">
+      <div class="loading-state" id="loadingState">
+        <div class="spinner"></div>
+        <p>Finding your perfect tracks…</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Manual Weather Modal -->
+  <div class="modal-overlay hidden" id="manualModal">
+    <div class="modal-box">
+      <button class="modal-close" id="closeManualModal">&times;</button>
+      <h2 class="modal-title">Set Weather Manually</h2>
+      <p class="modal-subtitle">Choose your current conditions to get matching music.</p>
+
+      <form id="manualWeatherForm" class="modal-form">
+        <div class="form-group">
+          <label for="selectWeather">Weather</label>
+          <select id="selectWeather" required>
+            <option value="">— Select weather —</option>
+            <option value="sunny">☀️  Sunny</option>
+            <option value="cloudy">☁️  Cloudy</option>
+            <option value="rainy">🌧️  Rainy</option>
+            <option value="snowy">❄️  Snowy</option>
+            <option value="stormy">⛈️  Stormy</option>
+            <option value="foggy">🌫️  Foggy</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="selectSeason">Season</label>
+          <select id="selectSeason" required>
+            <option value="">— Select season —</option>
+            <option value="spring">🌸  Spring</option>
+            <option value="summer">🌞  Summer</option>
+            <option value="autumn">🍂  Autumn</option>
+            <option value="winter">🌨️  Winter</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="selectTime">Time of Day</label>
+          <select id="selectTime" required>
+            <option value="">— Select time —</option>
+            <option value="morning">🌅  Morning</option>
+            <option value="afternoon">🌤️  Afternoon</option>
+            <option value="evening">🌆  Evening</option>
+            <option value="night">🌙  Night</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="cancelManualBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Get Recommendations</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

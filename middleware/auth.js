@@ -1,91 +1,99 @@
-const passport = require('passport');
-const SpotifyStrategy = require('passport-spotify').Strategy;
+const jwt = require('jsonwebtoken');
 const { query } = require('../config/database');
-require('dotenv').config();
 
-// Spotify OAuth Strategy
-passport.use(
-  new SpotifyStrategy(
-    {
-      clientID: process.env.SPOTIFY_CLIENT_ID,
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-      callbackURL: process.env.SPOTIFY_REDIRECT_URI,
-    },
-    async (accessToken, refreshToken, expires_in, profile, done) => {
-      try {
-        // Check if user exists
-        let result = await query(
-          'SELECT * FROM users WHERE spotify_id = $1',
-          [profile.id]
-        );
+// ── Authenticate regular user ───────────────────────────────
+const authenticateUser = async (req, res, next) => {
+  try {
+    const token = req.cookies?.token || req.headers?.authorization?.split(' ')[1];
 
-        let user;
+    if (!token) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
 
-        if (result.rows.length === 0) {
-          // Create new user
-          const insertResult = await query(
-            `
-            INSERT INTO users 
-              (spotify_id, email, display_name, profile_image_url, 
-               access_token, refresh_token, token_expires_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
-            RETURNING *
-            `,
-            [
-              profile.id,
-              profile.emails?.[0]?.value,
-              profile.displayName,
-              profile.photos?.[0]?.value,
-              accessToken,
-              refreshToken,
-              new Date(Date.now() + expires_in * 1000),
-            ]
-          );
-          user = insertResult.rows[0];
-        } else {
-          // Update existing user
-          const updateResult = await query(
-            `
-            UPDATE users 
-            SET access_token = $1,
-                refresh_token = $2,
-                token_expires_at = $3,
-                last_login = CURRENT_TIMESTAMP
-            WHERE spotify_id = $4
-            RETURNING *
-            `,
-            [
-              accessToken,
-              refreshToken,
-              new Date(Date.now() + expires_in * 1000),
-              profile.id,
-            ]
-          );
-          user = updateResult.rows[0];
-        }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        return done(null, user);
-      } catch (error) {
-        console.error('Passport Spotify error:', error);
-        return done(error, null);
+    const result = await query(
+      'SELECT id, username, email, full_name FROM users WHERE id = $1 AND is_active = true',
+      [decoded.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'User not found or inactive' });
+    }
+
+    req.user = result.rows[0];
+    next();
+  } catch (error) {
+    console.error('[Auth middleware] Error:', error);
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+};
+
+// Verify JWT token for admin users
+const authenticateAdmin = async (req, res, next) => {
+  try {
+    const token = req.cookies.adminToken || req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ error: 'Admin authentication required' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Verify admin exists in database
+    const result = await query('SELECT * FROM admins WHERE id = $1', [decoded.adminId]);
+    
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Admin not found' });
+    }
+
+    req.admin = result.rows[0];
+    next();
+  } catch (error) {
+    console.error('Admin authentication error:', error);
+    return res.status(401).json({ error: 'Invalid or expired admin token' });
+  }
+};
+
+// Check if admin has specific role
+const requireAdminRole = (allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.admin) {
+      return res.status(401).json({ error: 'Admin authentication required' });
+    }
+
+    if (!allowedRoles.includes(req.admin.role)) {
+      return res.status(403).json({ error: 'Insufficient permissions' });
+    }
+
+    next();
+  };
+};
+
+// Optional authentication (doesn't fail if no token)
+const optionalAuth = async (req, res, next) => {
+  try {
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const result = await query('SELECT * FROM users WHERE id = $1', [decoded.userId]);
+      
+      if (result.rows.length > 0) {
+        req.user = result.rows[0];
       }
     }
-  )
-);
-
-// Serialize user
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-// Deserialize user
-passport.deserializeUser(async (id, done) => {
-  try {
-    const result = await query('SELECT * FROM users WHERE id = $1', [id]);
-    done(null, result.rows[0]);
+    
+    next();
   } catch (error) {
-    done(error, null);
+    // Continue without authentication
+    next();
   }
-});
+};
 
-module.exports = passport;
+module.exports = {
+  authenticateUser,
+  authenticateAdmin,
+  requireAdminRole,
+  optionalAuth,
+};

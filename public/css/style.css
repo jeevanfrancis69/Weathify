@@ -1,0 +1,930 @@
+/*  Weathify — Main Stylesheet
+   Covers: reset, tokens, navbar, landing page, dashboard,
+           song cards, modals, loading states, responsive. */
+
+/* ── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Brand colours */
+  --purple-600:  #7C3AED;
+  --purple-500:  #8B5CF6;
+  --purple-400:  #A78BFA;
+  --cyan-500:    #06B6D4;
+  --cyan-400:    #22D3EE;
+  --pink-500:    #EC4899;
+
+  /* Surfaces */
+  --bg-900:  #060913;
+  --bg-800:  #0A0E1A;
+  --bg-700:  #0F1628;
+  --bg-card: #141824;
+  --bg-hover:#1A2035;
+
+  /* Borders */
+  --border:        #1E293B;
+  --border-active: #7C3AED;
+
+  /* Text */
+  --text-100: #FFFFFF;
+  --text-200: #E2E8F0;
+  --text-300: #94A3B8;
+  --text-400: #64748B;
+
+  /* Functional */
+  --success: #22C55E;
+  --error:   #EF4444;
+  --warning: #F59E0B;
+
+  /* Radii */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 30px rgba(124,58,237,0.25);
+
+  /* Transitions */
+  --t: 0.2s ease;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+               Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: var(--bg-800);
+  color: var(--text-100);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ── Typography helpers ───────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, var(--purple-600), var(--cyan-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border: none;
+  border-radius: var(--r-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--t);
+  text-decoration: none;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--purple-600), var(--purple-500));
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(124,58,237,0.45);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-200);
+  border: 1px solid var(--border);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--bg-card);
+  border-color: var(--purple-600);
+  color: var(--text-100);
+}
+
+.btn-large {
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  border-radius: var(--r-md);
+}
+
+.btn-sm {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.8rem;
+}
+
+.btn-block {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ── Navbar ───────────────────────────────────────────────── */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 1rem 0;
+  background: rgba(10, 14, 26, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-100);
+  text-decoration: none;
+  cursor: default;
+}
+
+.logo svg {
+  color: var(--purple-500);
+}
+
+.logo--centered {
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-greeting {
+  font-size: 0.85rem;
+  color: var(--text-300);
+}
+
+/* ── Hero Section ─────────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 100px 0 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle background radial glow */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 700px;
+  height: 500px;
+  background: radial-gradient(ellipse at center,
+    rgba(124, 58, 237, 0.12) 0%,
+    rgba(6, 182, 212, 0.06) 50%,
+    transparent 70%);
+  pointer-events: none;
+}
+
+.hero-container {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+/* Floating weather icon row */
+.weather-icon-row {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.hero-weather-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--text-400);
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+.hero-weather-icon:nth-child(1) { animation-delay: 0s; }
+.hero-weather-icon:nth-child(2) { animation-delay: 0.4s; }
+.hero-weather-icon:nth-child(3) { animation-delay: 0.8s; }
+.hero-weather-icon:nth-child(4) { animation-delay: 1.2s; }
+.hero-weather-icon:nth-child(5) { animation-delay: 1.6s; }
+
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0);    opacity: 0.5; }
+  50%       { transform: translateY(-8px); opacity: 1;   }
+}
+
+.hero-title {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.25rem;
+}
+
+.hero-subtitle {
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  color: var(--text-300);
+  line-height: 1.8;
+  margin-bottom: 2.5rem;
+}
+
+.hide-mobile {
+  display: inline;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ── Why Section ──────────────────────────────────────────── */
+.why-section {
+  padding: 5rem 0;
+  background: var(--bg-900);
+}
+
+.section-title {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+  text-align: center;
+  color: var(--text-300);
+  font-size: 1.1rem;
+  margin-bottom: 3rem;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 2.5rem 2rem;
+  transition: var(--t);
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--purple-600);
+  box-shadow: var(--shadow-glow);
+}
+
+.feature-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.feature-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.feature-icon--purple {
+  background: rgba(124, 58, 237, 0.15);
+  color: var(--purple-400);
+}
+
+.feature-icon--pink {
+  background: rgba(236, 72, 153, 0.15);
+  color: var(--pink-500);
+}
+
+.feature-icon--cyan {
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--cyan-400);
+}
+
+.feature-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.feature-description {
+  color: var(--text-300);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+/* ── How It Works Section ─────────────────────────────────── */
+.how-section {
+  padding: 5rem 0;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.step {
+  text-align: center;
+  padding: 0 1rem;
+}
+
+.step-number {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--purple-600), var(--cyan-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.step-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.step-description {
+  color: var(--text-300);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+/* CTA box */
+.cta-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 3.5rem 2rem;
+  text-align: center;
+}
+
+.cta-title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.cta-description {
+  color: var(--text-300);
+  font-size: 1.1rem;
+  margin-bottom: 1.75rem;
+}
+
+/* ── Footer ───────────────────────────────────────────────── */
+.footer {
+  background: var(--bg-900);
+  border-top: 1px solid var(--border);
+  padding: 2rem 0;
+}
+
+.footer-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.footer-logo svg {
+  color: var(--purple-500);
+}
+
+.footer-copy {
+  color: var(--text-400);
+  font-size: 0.85rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-links a {
+  color: var(--text-300);
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: var(--t);
+}
+
+.footer-links a:hover {
+  color: var(--text-100);
+}
+
+/* ── Dashboard ────────────────────────────────────────────── */
+.dashboard-wrap {
+  padding-top: 100px;
+  padding-bottom: 4rem;
+}
+
+/* Weather card */
+.weather-card {
+  background: linear-gradient(135deg,
+    rgba(124, 58, 237, 0.12),
+    rgba(6, 182, 212, 0.08));
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: var(--r-xl);
+  padding: 2rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.weather-card__left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.weather-icon-large {
+  width: 56px;
+  height: 56px;
+  color: var(--purple-400);
+  flex-shrink: 0;
+}
+
+.weather-icon-large svg {
+  width: 100%;
+  height: 100%;
+}
+
+.weather-condition {
+  font-size: 1.75rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  margin-bottom: 0.2rem;
+}
+
+.weather-location {
+  color: var(--text-300);
+  font-size: 0.9rem;
+}
+
+.weather-card__right {
+  text-align: right;
+}
+
+.weather-temp {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--purple-500), var(--cyan-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+.weather-context-badges {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.context-badge {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-300);
+  text-transform: capitalize;
+}
+
+/* Manual bar */
+.manual-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.manual-bar__label {
+  font-size: 0.875rem;
+  color: var(--text-400);
+}
+
+/* Recommendations */
+.recommendations-header {
+  margin-bottom: 1.5rem;
+}
+
+.rec-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.rec-explanation {
+  color: var(--text-300);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Songs grid */
+.songs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.25rem;
+}
+
+.song-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: var(--t);
+  text-decoration: none;
+  display: block;
+}
+
+.song-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--purple-600);
+  box-shadow: var(--shadow-glow);
+}
+
+.song-card__art {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: var(--bg-700);
+  display: block;
+}
+
+.song-card__body {
+  padding: 0.75rem;
+}
+
+.song-card__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0.2rem;
+}
+
+.song-card__artist {
+  font-size: 0.8rem;
+  color: var(--text-300);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0.5rem;
+}
+
+.song-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.tag-pill {
+  background: rgba(124,58,237,0.15);
+  color: var(--purple-400);
+  border-radius: 100px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+/* Spotify link indicator */
+.song-card__spotify {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: #1DB954;
+  margin-top: 0.4rem;
+}
+
+/* Loading state */
+.loading-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 0;
+  color: var(--text-400);
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--purple-500);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Empty/error state */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 0;
+  color: var(--text-400);
+}
+
+.empty-state p {
+  margin-bottom: 1rem;
+}
+
+/* ── Modal ────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  backdrop-filter: blur(4px);
+}
+
+.modal-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 2rem;
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-box--wide {
+  max-width: 680px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: var(--text-300);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: var(--t);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--r-sm);
+}
+
+.modal-close:hover {
+  color: var(--text-100);
+  background: var(--bg-hover);
+}
+
+.modal-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.modal-subtitle {
+  color: var(--text-300);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.modal-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0.5rem 0;
+}
+
+.modal-section-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-300);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Forms ────────────────────────────────────────────────── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-300);
+}
+
+.form-group .optional {
+  font-weight: 400;
+  color: var(--text-400);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.7rem 0.9rem;
+  background: var(--bg-800);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-100);
+  font-size: 0.95rem;
+  transition: var(--t);
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--purple-600);
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+}
+
+.form-group select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748B' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  padding-right: 2.5rem;
+}
+
+/* Alert box */
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--r-sm);
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.alert--error {
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #FCA5A5;
+}
+
+/* ── Tag pill used in non-admin views ─────────────────────── */
+.tag {
+  background: rgba(124,58,237,0.15);
+  color: var(--purple-400);
+  border-radius: 100px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hero {
+    padding: 90px 0 3rem;
+  }
+
+  .hide-mobile {
+    display: none;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btn-large {
+    width: 100%;
+    justify-content: center;
+    max-width: 320px;
+  }
+
+  .weather-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .weather-card__right {
+    text-align: left;
+    width: 100%;
+  }
+
+  .weather-context-badges {
+    justify-content: flex-start;
+  }
+
+  .footer-container {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-links {
+    justify-content: center;
+  }
+
+  .songs-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .features-grid,
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .weather-icon-row {
+    gap: 1rem;
+  }
+}
