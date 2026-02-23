@@ -364,7 +364,7 @@ router.post('/logout', (req, res) => {
   return res.json({ success: true, message: 'Logged out' });
 });
 
-// ADMIN LOGIN (unchanged)
+// ADMIN LOGIN 
 router.post('/admin/login', async (req, res) => {
   try {
     const { username, password } = req.body;
