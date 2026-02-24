@@ -102,7 +102,11 @@ npm run dev
 # Main site:       http://localhost:3000
 # Admin dashboard: http://localhost:3000/admin.html
 # Health check:    http://localhost:3000/health
+# Quick run: sudo systemctl start postgresql
+# npm run dev
 ```
+
+
 
 ---
 
