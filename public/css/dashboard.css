@@ -303,6 +303,33 @@
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+.song-card--hidden {
+  display: none;
+}
+
+/* ── Show More Button ───────────────────────────────────────── */
+
+.show-more-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.show-more-btn {
+  padding: 0.6rem 2rem;
+  font-size: 0.95rem;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: var(--t);
+}
+
+.show-more-btn:hover {
+  background: rgba(124, 58, 237, 0.15);
+  border-color: var(--purple-400);
+  color: var(--purple-300);
+}
+
 /* ── Toast Animations ───────────────────────────────────────── */
 
 @keyframes slideIn {

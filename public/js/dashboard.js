@@ -337,9 +337,34 @@ class DashboardApp {
       return;
     }
 
+    const INITIAL_COUNT = 3;
     const fragment = document.createDocumentFragment();
-    songs.forEach(song => fragment.appendChild(this._buildSongCard(song)));
+
+    songs.forEach((song, i) => {
+      const card = this._buildSongCard(song);
+      if (i >= INITIAL_COUNT) card.classList.add('song-card--hidden');
+      fragment.appendChild(card);
+    });
+
     grid.appendChild(fragment);
+
+    // Add "Show More" button if there are more than 3 songs
+    if (songs.length > INITIAL_COUNT) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'show-more-wrapper';
+      wrapper.innerHTML = `
+        <button class="btn btn-outline show-more-btn" id="showMoreBtn">
+          Show More (${songs.length - INITIAL_COUNT} more)
+        </button>`;
+      grid.after(wrapper);
+
+      wrapper.querySelector('#showMoreBtn').addEventListener('click', () => {
+        grid.querySelectorAll('.song-card--hidden').forEach(card => {
+          card.classList.remove('song-card--hidden');
+        });
+        wrapper.remove();
+      });
+    }
   }
 
   _buildSongCard(song) {
@@ -464,6 +489,7 @@ _showToast(message, type = 'info') {
     const grid = $('songsGrid');
     if (!grid) return;
     Array.from(grid.children).forEach(c => { if (c.id !== 'loadingState') c.remove(); });
+    document.querySelector('.show-more-wrapper')?.remove();
     grid.insertAdjacentHTML('beforeend', `
       <div class="empty-state">
         <p>${esc(msg)}</p>
@@ -481,6 +507,8 @@ _showToast(message, type = 'info') {
     if (on) {
       show(spinner);
       Array.from(grid.children).forEach(c => { if (c.id !== 'loadingState') c.remove(); });
+      // Remove any leftover Show More button
+      document.querySelector('.show-more-wrapper')?.remove();
     } else {
       hide(spinner);
     }
