@@ -679,9 +679,13 @@ class AdminApp {
   async _deleteTag(tagId, tagName) {
     if (!confirm(`Delete tag "${tagName}"?\n\nThis will remove it from all songs.`)) return;
 
-    // Note: add a DELETE /api/admin/tags/:id endpoint to backend if needed.
-    // For now, inform the user.
-    alert('Tag deletion requires a backend route DELETE /api/admin/tags/:id.\nSee routes/admin.js to add it.');
+    try {
+      await apiFetch(`/api/admin/tags/${tagId}`, { method: 'DELETE' });
+      alert(`Tag "${tagName}" deleted successfully.`);
+      this._loadTags(); // Refresh the tags list
+    } catch (error) {
+      alert(`Error deleting tag: ${error.message}`);
+    }
   }
 
   /* ── Modal helpers ──────────────────────────────────────── */

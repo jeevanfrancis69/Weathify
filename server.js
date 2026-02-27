@@ -10,6 +10,7 @@ require('dotenv').config();
 const authRoutes          = require('./routes/auth');
 const recommendationRoutes= require('./routes/recommendations');
 const adminRoutes         = require('./routes/admin');
+const spotifyRoutes       = require('./routes/spotify');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -80,6 +81,11 @@ app.use('/auth', authRoutes);
 app.use('/api/recommendations', recommendationRoutes);  // handles /api/recommendations/*
 app.use('/api', recommendationRoutes);                  // ALSO mount at /api/* for /api/playlist
 app.use('/api/admin', adminRoutes);
+app.use('/api/spotify', spotifyRoutes);                 // Spotify OAuth + Web Playback SDK
+
+// Spotify OAuth callback (Spotify redirects to /callback at root)
+const { spotifyCallback } = require('./routes/spotify');
+app.get('/callback', spotifyCallback);
 
 // Health check
 app.get('/health', (req, res) => {

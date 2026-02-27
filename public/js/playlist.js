@@ -12,6 +12,13 @@ class PlaylistApp {
     this.user = null;
     this._checkAuth();
     this._bindEvents();
+    this._initPlayer();
+  }
+
+  async _initPlayer() {
+    if (window.weathifyPlayer) {
+      await window.weathifyPlayer.init();
+    }
   }
 
   async _checkAuth() {
@@ -119,12 +126,17 @@ class PlaylistApp {
           </svg>
           Remove
         </button>
-        <a href="${esc(song.spotify_url)}" target="_blank" rel="noopener" class="btn-play">
+        <button class="btn-play"
+                data-spotify-track-id="${esc(song.spotify_track_id)}"
+                data-song-title="${esc(song.title)}"
+                data-song-artist="${esc(song.artist)}"
+                data-song-art="${esc(song.album_art_url || '')}"
+                title="Play on Spotify">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02z"/>
+            <path d="M8 5v14l11-7z"/>
           </svg>
           Play
-        </a>
+        </button>
       </div>
       <div class="song-card__meta">
         Saved on ${new Date(song.liked_at).toLocaleDateString()}
@@ -137,8 +149,35 @@ class PlaylistApp {
     this._removeSong(song.id, card);
   });
 
+  // Bind play button
+  const playBtn = card.querySelector('.btn-play');
+  playBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    this._playSong(song);
+  });
+
   return card;
 }
+
+  async _playSong(song) {
+    console.log('[Playlist] _playSong called:', song.title, '→ trackId:', song.spotify_track_id);
+    const player = window.weathifyPlayer;
+    if (!player) {
+      window.open(song.spotify_url, '_blank');
+      return;
+    }
+
+    const success = await player.play(song.spotify_track_id, {
+      title: song.title,
+      artist: song.artist,
+      album_art_url: song.album_art_url,
+      spotify_track_id: song.spotify_track_id,
+    });
+
+    if (!success && song.spotify_url) {
+      window.open(song.spotify_url, '_blank');
+    }
+  }
   async _removeSong(songId, cardElement) {
   try {
     const res = await fetch(`/api/recommendations/unlike/${songId}`, {

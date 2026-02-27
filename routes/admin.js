@@ -280,6 +280,27 @@ router.post('/tags', requireAdminRole(['admin']), async (req, res) => {
   }
 });
 
+// Delete a tag
+router.delete('/tags/:id', requireAdminRole(['admin']), async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await query(
+      'DELETE FROM tags WHERE id = $1 RETURNING *',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Tag not found' });
+    }
+
+    res.json({ success: true, message: 'Tag deleted', tag: result.rows[0] });
+  } catch (error) {
+    console.error('Error deleting tag:', error);
+    res.status(500).json({ error: 'Failed to delete tag' });
+  }
+});
+
 // Search Spotify
 router.get('/spotify/search', async (req, res) => {
   try {
