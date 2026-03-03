@@ -31,22 +31,22 @@ echo " PostgreSQL found"
 echo ""
 
 # Check if database exists
-if psql -U ${DB_USER} -lqt | cut -d \| -f 1 | grep -qw ${DB_NAME}; then
+if psql -h localhost -U ${DB_USER} -lqt | cut -d \| -f 1 | grep -qw ${DB_NAME}; then
     echo "⚠️  Database '${DB_NAME}' already exists"
     read -p "Do you want to drop and recreate it? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo "Dropping database..."
-        dropdb -U ${DB_USER} ${DB_NAME} || true
+        dropdb -h localhost -U ${DB_USER} ${DB_NAME} || true
     else
         echo "Keeping existing database"
     fi
 fi
 
 # Create database if it doesn't exist
-if ! psql -U ${DB_USER} -lqt | cut -d \| -f 1 | grep -qw ${DB_NAME}; then
+if ! psql -h localhost -U ${DB_USER} -lqt | cut -d \| -f 1 | grep -qw ${DB_NAME}; then
     echo " Creating database '${DB_NAME}'..."
-    createdb -U ${DB_USER} ${DB_NAME}
+    createdb -h localhost -U ${DB_USER} ${DB_NAME}
     echo " Database created"
 else
     echo " Using existing database"
@@ -56,7 +56,7 @@ echo ""
 
 # Run schema
 echo " Running database schema..."
-psql -U ${DB_USER} -d ${DB_NAME} -f database/schema.sql
+cat database/schema.sql | psql -h localhost -U ${DB_USER} -d ${DB_NAME}
 
 echo ""
 echo " Database setup complete!"
@@ -91,7 +91,7 @@ if [[ ! $REPLY =~ ^[Nn]$ ]]; then
     HASH=$(node -e "console.log(require('bcrypt').hashSync('${NEW_PASSWORD}', 10))")
     
     # Update password in database
-    psql -U ${DB_USER} -d ${DB_NAME} -c "UPDATE admins SET password_hash = '${HASH}' WHERE username = 'admin';"
+    psql -h localhost -U ${DB_USER} -d ${DB_NAME} -c "UPDATE admins SET password_hash = '${HASH}' WHERE username = 'admin';"
     
     echo " Admin password updated!"
 else

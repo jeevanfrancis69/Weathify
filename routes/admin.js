@@ -117,6 +117,13 @@ router.post('/songs', requireAdminRole(['admin']), async (req, res) => {
     // Fetch from Spotify
     const trackData = await spotifyService.getTrack(spotify_track_id);
 
+    // Normalize partial Spotify dates ("1985" → "1985-01-01")
+    let releaseDate = trackData.release_date || null;
+    if (releaseDate) {
+      if (/^\d{4}$/.test(releaseDate)) releaseDate += '-01-01';
+      else if (/^\d{4}-\d{2}$/.test(releaseDate)) releaseDate += '-01';
+    }
+
     // Insert into database
     const result = await query(
       `
@@ -137,7 +144,7 @@ router.post('/songs', requireAdminRole(['admin']), async (req, res) => {
         trackData.album_art_url,
         trackData.popularity,
         trackData.explicit,
-        trackData.release_date,
+        releaseDate,
       ]
     );
 

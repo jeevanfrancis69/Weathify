@@ -36,9 +36,9 @@ temp/
 *.tmp
 
 # Database
-*.sql.backup
-*.db
-*.sql
+# *.sql.backup
+# *.db
+# *.sql
 
 # OS
 Thumbs.db

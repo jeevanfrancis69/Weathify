@@ -59,6 +59,8 @@ class DashboardApp {
     this.user    = null;
     this.context = null;
     this.likedSongIds = new Set();
+    this.viewMode = 'grid'; // 'grid' or 'table'
+    this.lastRecommendationData = null;
 
     this._checkAuth();
     this._bindEvents();
@@ -79,7 +81,30 @@ class DashboardApp {
 
     // Initialize the Web Playback SDK player
     if (window.weathifyPlayer) {
-      await window.weathifyPlayer.init();
+      const ok = await window.weathifyPlayer.init();
+      this._updateSpotifyButton(ok);
+    } else {
+      this._updateSpotifyButton(false);
+    }
+  }
+
+  _updateSpotifyButton(connected) {
+    const btn = $('spotifyConnectBtn');
+    const txt = $('spotifyBtnText');
+    if (!btn || !txt) return;
+
+    if (connected) {
+      btn.classList.add('btn-spotify--connected');
+      btn.removeAttribute('href');
+      btn.style.cursor = 'default';
+      btn.title = 'Spotify is connected — music plays in-app';
+      txt.textContent = 'Spotify Connected';
+      btn.addEventListener('click', (e) => e.preventDefault());
+    } else {
+      btn.classList.remove('btn-spotify--connected');
+      btn.href = '/api/spotify/login';
+      btn.title = 'Connect your Spotify account for in-app playback';
+      txt.textContent = 'Connect Spotify';
     }
   }
 
@@ -163,6 +188,10 @@ class DashboardApp {
     $('manualModal')?.addEventListener('click', (e) => {
       if (e.target === $('manualModal')) this._closeManualModal();
     });
+
+    // View toggle (grid / table)
+    $('gridViewBtn')?.addEventListener('click', () => this._setViewMode('grid'));
+    $('tableViewBtn')?.addEventListener('click', () => this._setViewMode('table'));
   }
 
   async _logout() {
@@ -335,6 +364,7 @@ class DashboardApp {
   }
 
   _renderRecommendations(data) {
+    this.lastRecommendationData = data;
     const { songs = [], explanation = '' } = data;
     const grid  = $('songsGrid');
     const expEl = $('recExplanation');
@@ -342,7 +372,13 @@ class DashboardApp {
     if (expEl) expEl.textContent = explanation;
     if (!grid) return;
 
+    // Clear existing content
     Array.from(grid.children).forEach(c => { if (c.id !== 'loadingState') c.remove(); });
+    document.querySelector('.show-more-wrapper')?.remove();
+
+    // Reset grid class for current view mode
+    grid.classList.remove('songs-grid--table');
+    if (this.viewMode === 'table') grid.classList.add('songs-grid--table');
 
     if (songs.length === 0) {
       grid.insertAdjacentHTML('beforeend', `
@@ -356,6 +392,14 @@ class DashboardApp {
       return;
     }
 
+    if (this.viewMode === 'table') {
+      this._renderTableView(songs, grid);
+    } else {
+      this._renderGridView(songs, grid);
+    }
+  }
+
+  _renderGridView(songs, grid) {
     const INITIAL_COUNT = 3;
     const fragment = document.createDocumentFragment();
 
@@ -383,6 +427,89 @@ class DashboardApp {
         });
         wrapper.remove();
       });
+    }
+  }
+
+  _renderTableView(songs, grid) {
+    const table = document.createElement('div');
+    table.className = 'songs-table';
+
+    // Header
+    table.innerHTML = `
+      <div class="songs-table__header">
+        <span class="songs-table__cell songs-table__cell--num">#</span>
+        <span class="songs-table__cell songs-table__cell--title">Title</span>
+        <span class="songs-table__cell songs-table__cell--artist">Artist</span>
+        <span class="songs-table__cell songs-table__cell--tags">Tags</span>
+        <span class="songs-table__cell songs-table__cell--actions"></span>
+      </div>`;
+
+    songs.forEach((song, i) => {
+      const isLiked = this.likedSongIds.has(song.id);
+      const tags = (song.matched_tags || [])
+        .filter(Boolean).slice(0, 3)
+        .map(t => `<span class="tag-pill tag-pill--sm">${esc(t)}</span>`)
+        .join('');
+
+      const row = document.createElement('div');
+      row.className = 'songs-table__row';
+      row.innerHTML = `
+        <span class="songs-table__cell songs-table__cell--num">${i + 1}</span>
+        <span class="songs-table__cell songs-table__cell--title">
+          <img class="songs-table__art" 
+               src="${esc(song.album_art_url || '/images/placeholder.svg')}"
+               alt="" loading="lazy"
+               onerror="this.src='/images/placeholder.svg'">
+          <span class="songs-table__song-name">${esc(song.title)}</span>
+        </span>
+        <span class="songs-table__cell songs-table__cell--artist">${esc(song.artist)}</span>
+        <span class="songs-table__cell songs-table__cell--tags">${tags}</span>
+        <span class="songs-table__cell songs-table__cell--actions">
+          <button class="btn-like ${isLiked ? 'liked' : ''}" data-song-id="${song.id}" title="${isLiked ? 'Unlike' : 'Like'}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="${isLiked ? 'currentColor' : 'none'}">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="btn-play" 
+                  data-spotify-track-id="${esc(song.spotify_track_id)}"
+                  title="Play">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </button>
+        </span>`;
+
+      // Bind events
+      const likeBtn = row.querySelector('.btn-like');
+      likeBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this._likeSong(song, likeBtn);
+      });
+
+      const playBtn = row.querySelector('.btn-play');
+      playBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this._playSong(song);
+      });
+
+      table.appendChild(row);
+    });
+
+    grid.appendChild(table);
+  }
+
+  _setViewMode(mode) {
+    if (mode === this.viewMode) return;
+    this.viewMode = mode;
+
+    // Toggle active class on buttons
+    $('gridViewBtn')?.classList.toggle('active', mode === 'grid');
+    $('tableViewBtn')?.classList.toggle('active', mode === 'table');
+
+    // Re-render with stored data
+    if (this.lastRecommendationData) {
+      this._renderRecommendations(this.lastRecommendationData);
     }
   }
 

@@ -616,9 +616,9 @@ class AdminApp {
 
   _renderTagClouds(tags) {
     const clouds = {
-      weather:     $('tagCloudWeather'),
-      season:      $('tagCloudSeason'),
-      time_of_day: $('tagCloudTime'),
+      weather:  $('tagCloudWeather'),
+      season:   $('tagCloudSeason'),
+      time:     $('tagCloudTime'),
     };
 
     // Clear all

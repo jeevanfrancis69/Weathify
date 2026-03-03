@@ -100,7 +100,7 @@ router.post('/like', authenticateUser, async (req, res) => {
 
     // Check if already liked
     const existing = await query(
-      'SELECT id FROM liked_songs WHERE user_id = $1 AND song_id = $2',
+      'SELECT 1 FROM liked_songs WHERE user_id = $1 AND song_id = $2',
       [req.user.id, song_id]
     );
 
@@ -127,7 +127,7 @@ router.delete('/unlike/:song_id', authenticateUser, async (req, res) => {
     const { song_id } = req.params;
 
     const result = await query(
-      'DELETE FROM liked_songs WHERE user_id = $1 AND song_id = $2 RETURNING id',
+      'DELETE FROM liked_songs WHERE user_id = $1 AND song_id = $2 RETURNING song_id',
       [req.user.id, song_id]
     );
 
