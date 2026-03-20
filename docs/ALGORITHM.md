@@ -21,7 +21,7 @@ Before scoring can begin, the system resolves three context variables:
 
 ### Weather Categories
 ```
-sunny | rainy | cloudy | snowy | stormy | foggy
+sunny | rainy | cloudy | snowy | stormy | foggy | windy
 ```
 
 ### Season Logic
@@ -128,15 +128,20 @@ to introduce freshness across repeated requests for the same context.
 
 ## 5. Fallback Strategy
 
-If the scored query returns zero results (empty library or no tag matches):
+If the main scoring query fails (for example due to a database error), the
+service falls back to returning the top‑`N` songs ordered by popularity:
 ```
-1. Try matching weather only   (relax season + time)
-2. Try matching season only    (relax weather + time)
-3. Return top-N by popularity  (complete fallback)
+SELECT
+    id, spotify_track_id, title, artist, album,
+    duration_ms, preview_url, spotify_url, album_art_url,
+    popularity, explicit, release_date
+FROM songs
+ORDER BY popularity DESC
+LIMIT $limit;
 ```
 
-The fallback is handled transparently — the user still receives music,
-and the explanation text adapts accordingly.
+In this case the explanation text is a generic message such as:
+"Here are some popular tracks you might enjoy."
 
 ---
 

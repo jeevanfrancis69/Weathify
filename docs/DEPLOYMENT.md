@@ -41,9 +41,9 @@ node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 
 1. Go to [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard)
 2. Open your app → **Edit Settings**
-3. Add to **Redirect URIs**:
+3. Add to **Redirect URIs** (recommended):
 ```
-   https://yourdomain.com/auth/spotify/callback
+  https://yourdomain.com/callback
 ```
 4. Save changes
 5. Update `SPOTIFY_REDIRECT_URI` in your production environment
@@ -70,7 +70,7 @@ heroku config:set NODE_ENV=production
 heroku config:set PORT=3000
 heroku config:set SPOTIFY_CLIENT_ID=xxx
 heroku config:set SPOTIFY_CLIENT_SECRET=xxx
-heroku config:set SPOTIFY_REDIRECT_URI=https://your-app-name.herokuapp.com/auth/spotify/callback
+heroku config:set SPOTIFY_REDIRECT_URI=https://your-app-name.herokuapp.com/callback
 heroku config:set OPENWEATHER_API_KEY=xxx
 heroku config:set JWT_SECRET=xxx
 heroku config:set SESSION_SECRET=xxx
@@ -85,6 +85,13 @@ git push heroku main
 ### Run Database Schema
 ```bash
 heroku pg:psql < database/schema.sql
+```
+
+### Seed Admin and Songs (optional)
+```bash
+# From a one-off dyno, after your config vars are set:
+heroku run node database/seed_admin.js --reset
+heroku run node database/seed_songs.js
 ```
 
 ### Verify
@@ -150,6 +157,12 @@ nano .env   # fill in all values
 
 # Run schema
 psql -U weathify -d weathify_db < database/schema.sql
+
+# Optional: create/reset admin user (uses ADMIN_* env vars if set)
+node database/seed_admin.js --reset
+
+# Optional: seed sample songs from Spotify (requires SPOTIFY_* env)
+node database/seed_songs.js
 ```
 
 ### PM2 Process Manager
@@ -202,17 +215,17 @@ sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
 
 ### Change Admin Password
 ```bash
-# Generate a bcrypt hash for your new password
-node -e "require('bcrypt').hash('YOUR_NEW_PASSWORD', 10).then(console.log)"
-
-# Apply it (replace the hash below)
-psql -U weathify -d weathify_db \
-  -c "UPDATE admins SET password_hash = '\$2b\$10\$...' WHERE username = 'admin';"
+# Use the seeder to (re)set the admin password
+ADMIN_PASS="YOUR_NEW_PASSWORD" node database/seed_admin.js --reset
 ```
 
 ### Seed the Database (optional)
 ```bash
-psql -U weathify -d weathify_db < database/seed.sql
+# Seed admin (if not already done)
+node database/seed_admin.js --reset
+
+# Seed songs (requires valid SPOTIFY_* credentials)
+node database/seed_songs.js
 ```
 
 ### Smoke Tests
