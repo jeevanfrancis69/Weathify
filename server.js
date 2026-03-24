@@ -79,9 +79,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ── 8. Routes ────────────────────────────────────────────────
 app.use('/auth', authRoutes);
 app.use('/api/recommendations', recommendationRoutes);  // handles /api/recommendations/*
-app.use('/api', recommendationRoutes);                  // ALSO mount at /api/* for /api/playlist
 app.use('/api/admin', adminRoutes);
-app.use('/api/spotify', spotifyRoutes);                 // Spotify OAuth + Web Playback SDK
+app.use('/api/spotify', spotifyRoutes);
+app.use('/api', recommendationRoutes);                  // ALSO mount at /api/* for /api/playlist
+
+
 
 // Spotify OAuth callback (Spotify redirects to /callback at root)
 const { spotifyCallback } = require('./routes/spotify');
