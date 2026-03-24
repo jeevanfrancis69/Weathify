@@ -18,6 +18,38 @@ class WeathifyPlayer {
     this._initPromise = null;
     this._islandRendered = false;
     this._pendingTrackId = null; // track the ID we REQUESTED
+
+    // Circular queue state
+    this._queue = [];        // array of song objects
+    this._queueIndex = -1;   // current position
+    this._queueSource = 'dashboard'; // 'dashboard' | 'liked'
+  }
+
+  /* ── Queue helpers ──────────────────────────────────────── */
+
+  _loadQueue() {
+    try {
+      const raw  = localStorage.getItem('playerQueue');
+      const idx  = localStorage.getItem('playerQueueIndex');
+      const src  = localStorage.getItem('playerQueueSource') || 'dashboard';
+      this._queue       = raw  ? JSON.parse(raw)  : [];
+      this._queueIndex  = idx  != null ? parseInt(idx, 10) : -1;
+      this._queueSource = src;
+    } catch { this._queue = []; this._queueIndex = -1; }
+  }
+
+  _saveQueue() {
+    localStorage.setItem('playerQueue', JSON.stringify(this._queue));
+    localStorage.setItem('playerQueueIndex', String(this._queueIndex));
+    localStorage.setItem('playerQueueSource', this._queueSource);
+  }
+
+  _stepQueue(direction) {
+    this._loadQueue();
+    if (!this._queue.length) return null;
+    this._queueIndex = (this._queueIndex + direction + this._queue.length) % this._queue.length;
+    this._saveQueue();
+    return this._queue[this._queueIndex];
   }
 
   /* ── Initialise ─────────────────────────────────────────── */
@@ -183,8 +215,34 @@ class WeathifyPlayer {
   }
 
   async togglePlay() { if (this.player) await this.player.togglePlay(); }
-  async nextTrack()  { if (this.player) await this.player.nextTrack(); }
-  async previousTrack() { if (this.player) await this.player.previousTrack(); }
+
+  async nextTrack() {
+    const song = this._stepQueue(1);
+    if (song) {
+      await this.play(song.spotify_track_id, {
+        title: song.title,
+        artist: song.artist,
+        album_art_url: song.album_art_url,
+        spotify_track_id: song.spotify_track_id,
+      });
+    } else if (this.player) {
+      await this.player.nextTrack();
+    }
+  }
+
+  async previousTrack() {
+    const song = this._stepQueue(-1);
+    if (song) {
+      await this.play(song.spotify_track_id, {
+        title: song.title,
+        artist: song.artist,
+        album_art_url: song.album_art_url,
+        spotify_track_id: song.spotify_track_id,
+      });
+    } else if (this.player) {
+      await this.player.previousTrack();
+    }
+  }
 
   async setVolume(v) {
     if (!this.player) return;
@@ -217,6 +275,12 @@ class WeathifyPlayer {
         duration_ms: track.duration_ms,
         spotify_track_id: track.id,
       };
+      // Keep queue index in sync with what Spotify is actually playing
+      this._loadQueue();
+      const qi = this._queue.findIndex(s => s.spotify_track_id === track.id);
+      if (qi !== -1) { this._queueIndex = qi; this._saveQueue(); }
+      // Persist current track for musicdashboard
+      localStorage.setItem('playerCurrentTrack', JSON.stringify(this.currentTrack));
     }
 
     if (this.isPlaying && this.currentTrack) {
@@ -226,6 +290,7 @@ class WeathifyPlayer {
     }
 
     this._updateProgress(state.position, state.duration);
+    localStorage.setItem('playerPosition', state.position);
 
     // Continuous progress tick
     if (this.progressInterval) clearInterval(this.progressInterval);
@@ -245,6 +310,9 @@ class WeathifyPlayer {
   /* ── Island UI ──────────────────────────────────────────── */
 
   _showIsland(track) {
+    if (window.location.pathname.includes('musicdashboard.html')) {
+    return;
+}
     let island = document.getElementById('playerIsland');
 
     if (!island) {
@@ -252,14 +320,13 @@ class WeathifyPlayer {
       island.id = 'playerIsland';
       island.className = 'player-island';
       island.innerHTML = `
-        <div class="player-island__progress" id="islandProgressBar">
-          <div class="player-island__progress-fill" id="islandProgressFill"></div>
-        </div>
+        <input type="range" class="player-island__slider" id="islandSlider"
+               min="0" max="1000" value="0" step="1">
         <div class="player-island__body">
           <img class="player-island__art" id="islandArt"
                src="/images/placeholder.svg" alt=""
                onerror="this.src='/images/placeholder.svg'">
-          <div class="player-island__info">
+          <div class="player-island__info" id="islandInfoLink" style="cursor:pointer;" title="Open player">
             <div class="player-island__title" id="islandTitle">—</div>
             <div class="player-island__artist" id="islandArtist">—</div>
           </div>
@@ -284,6 +351,20 @@ class WeathifyPlayer {
       document.getElementById('islandToggle')?.addEventListener('click', () => this.togglePlay());
       document.getElementById('islandPrev')?.addEventListener('click', () => this.previousTrack());
       document.getElementById('islandNext')?.addEventListener('click', () => this.nextTrack());
+
+      // Draggable progress slider
+      const slider = document.getElementById('islandSlider');
+      slider?.addEventListener('input', () => {
+        const pct = slider.value / 1000;
+        const ms  = Math.round(pct * (this.currentTrack?.duration_ms || 0));
+        this.seek(ms);
+        this._tintSlider(slider);
+      });
+
+      // Click track info → open musicdashboard
+      document.getElementById('islandInfoLink')?.addEventListener('click', () => {
+        window.location.href = '/musicdashboard.html';
+      });
     }
 
     // Update content
@@ -315,11 +396,26 @@ class WeathifyPlayer {
   }
 
   _updateProgress(posMs, durMs) {
-    const fill = document.getElementById('islandProgressFill');
-    if (!fill) return;
-    const pct = durMs > 0 ? (posMs / durMs) * 100 : 0;
-    fill.style.width = `${pct}%`;
+    // Island slider
+    const slider = document.getElementById('islandSlider');
+    if (slider) {
+      const pct = durMs > 0 ? posMs / durMs : 0;
+      slider.value = Math.round(pct * 1000);
+      this._tintSlider(slider);
+    }
     if (this.currentTrack) this.currentTrack.duration_ms = durMs;
+
+    // Dashboard elements (when on musicdashboard page)
+    if (window.location.pathname.includes('musicdashboard')) {
+      if (typeof dashboardUpdateProgress === 'function') {
+        dashboardUpdateProgress(posMs, durMs);
+      }
+    }
+  }
+
+  _tintSlider(slider) {
+    const pct = (slider.value / slider.max) * 100;
+    slider.style.background = `linear-gradient(to right, #7c6af7 ${pct}%, #2a2a2a ${pct}%)`;
   }
 
   /* ── Card button sync ───────────────────────────────────── */
@@ -365,3 +461,41 @@ class WeathifyPlayer {
 
 // ── Global singleton ─────────────────────────────────────────
 window.weathifyPlayer = new WeathifyPlayer();
+
+/* ── Island slider CSS injected once ───────────────────────── */
+(function injectIslandSliderCSS() {
+  if (document.getElementById('_islandSliderStyle')) return;
+  const s = document.createElement('style');
+  s.id = '_islandSliderStyle';
+  s.textContent = `
+    .player-island__slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 3px;
+      border-radius: 999px;
+      outline: none;
+      cursor: pointer;
+      display: block;
+      background: linear-gradient(to right, #7c6af7 0%, #2a2a2a 0%);
+      margin-bottom: 4px;
+    }
+    .player-island__slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #f0f0f0;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.15s, transform 0.12s;
+    }
+    .player-island:hover .player-island__slider::-webkit-slider-thumb {
+      opacity: 1;
+    }
+    .player-island__slider:hover::-webkit-slider-thumb {
+      transform: scale(1.3);
+    }
+  `;
+  document.head.appendChild(s);
+})();
