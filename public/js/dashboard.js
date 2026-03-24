@@ -202,6 +202,20 @@ class DashboardApp {
   }
 
   _requestLocation() {
+    // If a song is already playing, restore cached recommendations instead of re-fetching
+    const playing = localStorage.getItem('playerCurrentTrack');
+    const cachedRecs = localStorage.getItem('dashLastRecommendations');
+    const cachedCtx  = localStorage.getItem('dashLastContext');
+    if (playing && cachedRecs) {
+      try {
+        const data = JSON.parse(cachedRecs);
+        if (cachedCtx) this._renderWeather(JSON.parse(cachedCtx), null);
+        this._renderRecommendations(data);
+        this._setLoading(false);
+        return;
+      } catch { /* fall through to normal fetch */ }
+    }
+
     if (!('geolocation' in navigator)) {
       this._openManualModal();
       return;
@@ -327,6 +341,9 @@ class DashboardApp {
   }
 
   _refresh() {
+    // Clear cache so refresh always fetches fresh data
+    localStorage.removeItem('dashLastRecommendations');
+    localStorage.removeItem('dashLastContext');
     if (this.context) {
       this._fetchByContext(this.context.weather, this.context.season, this.context.time_of_day);
     } else {
@@ -365,6 +382,11 @@ class DashboardApp {
 
   _renderRecommendations(data) {
     this.lastRecommendationData = data;
+    // Cache so we can restore without re-fetching if a song is already playing
+    try {
+      localStorage.setItem('dashLastRecommendations', JSON.stringify(data));
+      if (this.context) localStorage.setItem('dashLastContext', JSON.stringify(this.context));
+    } catch { /* storage full – ignore */ }
     const { songs = [], explanation = '' } = data;
     const grid  = $('songsGrid');
     const expEl = $('recExplanation');
@@ -621,22 +643,29 @@ async _likeSong(song, button) {
   }
 }
 
-async _playSong(song) {
-  console.log('[Dashboard] _playSong called:', song.title, '→ trackId:', song.spotify_track_id);
-  const player = window.weathifyPlayer;
-  if (!player) {
+async _playSong(song, source = 'dashboard') {
+    const songs = this.lastRecommendationData?.songs || [];
+    const index = songs.findIndex(s => s.spotify_track_id === song.spotify_track_id);
+
+    localStorage.setItem("playerQueue", JSON.stringify(songs));
+    localStorage.setItem("playerQueueIndex", String(index));
+    localStorage.setItem("playerQueueSource", source);
+    
+    console.log('[Dashboard] _playSong called:', song.title, '→ trackId:', song.spotify_track_id);
+    const player = window.weathifyPlayer;
+    if (!player) {
     window.open(song.spotify_url, '_blank');
     return;
-  }
+    }
 
-  const success = await player.play(song.spotify_track_id, {
-    title: song.title,
-    artist: song.artist,
-    album_art_url: song.album_art_url,
-    spotify_track_id: song.spotify_track_id,
-  });
+    const success = await player.play(song.spotify_track_id, {
+      title: song.title,
+      artist: song.artist,
+      album_art_url: song.album_art_url,
+      spotify_track_id: song.spotify_track_id,
+    });
 
-  if (!success && song.spotify_url) {
+    if (!success && song.spotify_url) {
     // Fallback: open Spotify URL if SDK fails
     window.open(song.spotify_url, '_blank');
   }
@@ -723,6 +752,9 @@ _showToast(message, type = 'info') {
 
     if (!weather || !season || !time_of_day) return;
 
+    // Clear cache so manual selection always fetches fresh data
+    localStorage.removeItem('dashLastRecommendations');
+    localStorage.removeItem('dashLastContext');
     this._closeManualModal();
     this._fetchByContext(weather, season, time_of_day);
   }
