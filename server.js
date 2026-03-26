@@ -79,8 +79,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ── 8. Routes ────────────────────────────────────────────────
 app.use('/auth', authRoutes);
 app.use('/api/recommendations', recommendationRoutes);  // handles /api/recommendations/*
-app.use('/api/admin', adminRoutes);
-app.use('/api/spotify', spotifyRoutes);
+app.use('/api/admin', adminRoutes);                    //modified
+app.use('/api/spotify', spotifyRoutes);               //modified
 app.use('/api', recommendationRoutes);                  // ALSO mount at /api/* for /api/playlist
 
 
