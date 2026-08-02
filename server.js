@@ -48,13 +48,18 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // ── 4. Body parsers & Cookie parser ──────────────────────────
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+//  turns requests into req.body and req.cookies
+app.use(express.json()); // middleware that translates those numbers of bytes into JSON objects(dictionary structure) so you can just type req.body.username or req.body.password
+app.use(express.urlencoded({ extended: true }));//for old-school HTML form submissions
 app.use(cookieParser());
 
 // ── 5. Session ───────────────────────────────────────────────
+// express-session package generates a random unique sessionID per user
+// sessionID gets signed with the SESSION_SECRET
+// SESSION_SECRET: signature = HMAC(sessionID, secret). The cookie sent to the browser is sessionID + '.' + signature.
 app.use(session({
-  secret:            process.env.SESSION_SECRET || 'weathify-dev-secret-change-me',
+  secret:            process.env.SESSION_SECRET || 'weathify-dev-secret-change-me', // used to sign the sessionID cookie so server can detect if cookie has been tampered with
   resave:            false,
   saveUninitialized: false,
   cookie: {
