@@ -79,7 +79,7 @@ class WeathifyPlayer {
       return true;
     } catch (err) {
       console.error('[Player] Init failed:', err);
-      this.connected = false;
+      this._ready = false;
       return false;
     }
   }
@@ -114,11 +114,17 @@ class WeathifyPlayer {
         console.error('[Player] Init error:', message); reject(new Error(message));
       });
       this.player.addListener('authentication_error', ({ message }) => {
-        console.error('[Player] Auth error:', message); this.connected = false;
+        console.error('[Player] Auth error:', message);
+        this._ready = false;
+        this._showToast('Authentication error! ', 'error' );
+        reject(new Error(message));
       });
+
       this.player.addListener('account_error', ({ message }) => {
         console.error('[Player] Account error (Premium required):', message);
+        this._ready = false;
         this._showToast('Spotify Premium is required for playback.', 'error');
+        reject(new Error(message));
       });
       this.player.addListener('playback_error', ({ message }) => {
         console.error('[Player] Playback error:', message);
