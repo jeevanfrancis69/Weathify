@@ -164,7 +164,7 @@ class DashboardApp {
   async _loadLikedSongs() {
   try {
     const res = await fetch('/api/recommendations/playlist', {
-      credentials: 'include'  // ← ADDED
+      credentials: 'include'
     });
     
     if (!res.ok) return;
