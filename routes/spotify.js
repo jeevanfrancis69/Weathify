@@ -19,6 +19,8 @@ const SCOPES = [
 // ── Redirect user to Spotify authorization ────────────────────
 router.get('/login', authenticateUser, (req, res) => {
   const state = Buffer.from(JSON.stringify({ userId: req.user.id })).toString('base64');
+  // state param has to travel as plain text in the URL. Since URL cannot contain raw JSON with characters such as {}, "< :,
+  // they need heavy escaping
 
   const params = new URLSearchParams({
     response_type: 'code',
