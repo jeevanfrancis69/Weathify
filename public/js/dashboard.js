@@ -70,18 +70,22 @@ class DashboardApp {
   async _initPlayer() {
     // Check for Spotify connection callback
     const params = new URLSearchParams(window.location.search);
-    if (params.get('spotify_connected') === 'true') {
-      this._showToast('Spotify connected! You can now play music directly.', 'success');
-      // Clean URL
-      window.history.replaceState({}, '', '/dashboard.html');
-    } else if (params.get('spotify_error')) {
-      this._showToast(`Spotify connection failed: ${params.get('spotify_error')}`, 'error');
-      window.history.replaceState({}, '', '/dashboard.html');
+    const spotifyConnected = params.get('spotify_connected') === 'true';
+    const errorFromCallback = params.get('spotify_error');
+    window.history.replaceState({}, '', '/dashboard.html');
+
+    if (errorFromCallback) {
+      this._showToast(`Spotify connection failed! ${errorFromCallback}`, error);
     }
 
     // Initialize the Web Playback SDK player
     if (window.weathifyPlayer) {
-      const ok = await window.weathifyPlayer.init();
+      console.log("WeathifyPlayer exists");
+      const ok = await window.weathifyPlayer.init(); // Call .init() and AWAIT the background setup (token check, SDK loading, player connect)
+
+      if (spotifyConnected && ok){
+        this._showToast("Spotify connected! SDK succesful! You can now play music directly")
+      }
       this._updateSpotifyButton(ok);
     } else {
       this._updateSpotifyButton(false);
