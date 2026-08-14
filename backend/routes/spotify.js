@@ -63,7 +63,7 @@ async function spotifyCallbackHandler(req, res) {
       new URLSearchParams({
         grant_type: 'authorization_code',
         code,
-        redirect_uri: SPOTIFY_REDIRECT_URI,
+        redirect_uri: SPOTIFY_REDIRECT_URI, // matching credentials as a security check
       }).toString(),
       {
         headers: {
@@ -95,6 +95,8 @@ async function spotifyCallbackHandler(req, res) {
   }
 }
 
+
+// called because URI redirect is set to this
 router.get('/callback', spotifyCallbackHandler);
 
 // ── Get current user's Spotify access token ───────────────────
