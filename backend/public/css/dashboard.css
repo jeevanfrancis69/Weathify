@@ -2,6 +2,12 @@
 
 /* Inherits base styles from style.css */
 
+/* class .btn that also has hidden attributes*/
+.btn[hidden] {
+  display: none !important;
+}
+
+
 /* ── Spotify Connect Button ───────────────────────────────── */
 .btn-spotify {
   display: inline-flex;

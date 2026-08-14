@@ -74,6 +74,7 @@ class DashboardApp {
     const errorFromCallback = params.get('spotify_error');
     window.history.replaceState({}, '', '/dashboard.html');
 
+
     if (errorFromCallback) {
       this._showToast(`Spotify connection failed! ${errorFromCallback}`, error);
     }
@@ -87,8 +88,10 @@ class DashboardApp {
         this._showToast("Spotify connected! SDK succesful! You can now play music directly")
       }
       this._updateSpotifyButton(ok);
+      this._updateProfileButton(ok);
     } else {
       this._updateSpotifyButton(false);
+      this._updateProfileButton(false);
     }
   }
 
@@ -110,6 +113,12 @@ class DashboardApp {
       btn.title = 'Connect your Spotify account for in-app playback';
       txt.textContent = 'Connect Spotify';
     }
+  }
+
+  _updateProfileButton(connected){
+    const profileButton = $('profileButton');
+    if (!profileButton) return;
+    profileButton.hidden = !connected;
   }
 
   async _checkAuth() {

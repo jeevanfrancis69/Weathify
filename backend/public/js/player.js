@@ -155,7 +155,7 @@ class WeathifyPlayer {
 
   async play(spotifyTrackId, songMeta) {
     console.log('[Player] play() called with trackId:', spotifyTrackId, 'meta:', songMeta?.title);
-
+    console.log(this.deviceId);
     if (!this._ready || !this.deviceId) {
       console.warn('[Player] Not ready, attempting init…');
       const ok = await this.init();
@@ -199,7 +199,8 @@ class WeathifyPlayer {
       });
 
       if (res.status === 403) {
-        this._showToast('Spotify Premium is required for playback.', 'error');
+        const body = await res.text();
+        console.log("[Player] 403 response body : " , body);
         this._hideIsland();
         return false;
       }
