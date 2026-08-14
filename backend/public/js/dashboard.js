@@ -72,7 +72,9 @@ class DashboardApp {
     const params = new URLSearchParams(window.location.search);
     const spotifyConnected = params.get('spotify_connected') === 'true';
     const errorFromCallback = params.get('spotify_error');
-    window.history.replaceState({}, '', '/dashboard.html');
+    if (window.location.pathname.includes('dashboard.html')){
+      window.history.replaceState({}, '', '/dashboard.html');
+    }
 
 
     if (errorFromCallback) {
