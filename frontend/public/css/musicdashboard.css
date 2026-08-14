@@ -1,0 +1,222 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:       #0e0e0e;
+            --surface:  #171717;
+            --surface2: #1f1f1f;
+            --border:   #2a2a2a;
+            --accent:   #7c6af7;
+            --text:     #f0f0f0;
+            --muted:    #777;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: radial-gradient(circle at top, #1f1f2e, #0e0e0e);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ── Navbar ── */
+        #navbar {
+            height: 62px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            align-items: center;
+            padding: 0 28px;
+            flex-shrink: 0;
+        }
+
+        .nav-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;   /* center content inside */
+        gap: 10px;
+        font-size: 1.3rem;         /* bigger text */
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        grid-column: 2;         
+
+        }
+
+        .nav-logo svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--accent);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            font-size: 1.5rem;
+            filter: drop-shadow(0 0 6px rgba(124,106,247,0.6));
+        }
+
+
+        /* ── Main ── */
+        .app {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .now-playing {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-start;
+            padding: 0 32px 24px;
+        }
+
+        .now-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .cover {
+            width: 220px;
+            height: 220px;
+            background: #000;
+            border-radius: 12px;
+            box-shadow: 0 0 0 1px var(--border), 0 24px 64px rgba(0,0,0,0.7);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 60%);
+        }
+
+        #track-title {
+            font-size: 17px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        #track-artist {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        /* ── Footer ── */
+        .player-dashboard {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 10px 24px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .player-controls button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.15s, color 0.15s, transform 0.15s;
+        }
+
+        .player-controls button:hover {
+            background: var(--surface2);
+            color: var(--text);
+            transform: scale(1.2);
+        }
+
+        .player-controls button svg {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .btn-previous svg, .btn-next svg { width: 17px; height: 17px; }
+
+        .btn-main-play {
+            color: var(--text) !important;
+            background: var(--surface2) !important;
+            border: 1px solid var(--border) !important;
+            width: 42px;
+            height: 42px;
+        }
+
+        .btn-main-play:hover {
+            background: var(--accent) !important;
+            border-color: var(--accent) !important;
+            transform: scale(1.07);
+        }
+
+        .btn-main-play svg { width: 17px; height: 17px; }
+
+        /* progress */
+        .progress-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .time {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .progress-bar { flex: 1; }
+
+        .progress-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 3px;
+            border-radius: 999px;
+            outline: none;
+            cursor: pointer;
+            --value: 0%;
+            background: linear-gradient(to right, var(--accent) var(--value), var(--border) var(--value));
+        }
+
+        .progress-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text);
+            cursor: pointer;
+            transition: transform 0.12s;
+        }
+
+        .progress-slider:hover { transform: scaleY(1.2); }
+        .progress-slider:hover::-webkit-slider-thumb { transform: scale(1.3); }
+        .progress-slider:active::-webkit-slider-thumb { transform: scale(1.5); }

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Playlist — Weathify</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/player.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M3 9C3 9 4.5 7 7 7C9.5 7 10.5 9 13 9C15.5 9 16.5 7 19 7C21.5 7 22 9 22 9"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M3 14C3 14 4.5 12 7 12C9.5 12 10.5 14 13 14C15.5 14 16.5 12 19 12C21.5 12 22 14 22 14"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Weathify</span>
+      </div>
+      <div class="nav-links">
+        <a href="/dashboard.html" class="btn btn-outline btn-sm">Dashboard</a>
+        <span class="user-greeting" id="userGreeting">Loading...</span>
+        <button class="btn btn-outline btn-sm" id="logoutBtn">Log Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="dashboard-wrap container">
+    <div class="page-header">
+      <h1 class="page-title">My Liked Songs</h1>
+      <p class="page-subtitle">Your saved tracks organized by context</p>
+    </div>
+
+    <div class="songs-grid" id="playlistGrid">
+      <div class="loading-state" id="loadingState">
+        <div class="spinner"></div>
+        <p>Loading your playlist…</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/player.js"></script>
+  <script src="/js/playlist.js"></script>
+  <script src="/js/musicdashboard.js"></script>
+</body>
+</html>

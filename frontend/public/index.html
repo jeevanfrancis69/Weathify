@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weathify – Music That Matches Your Weather</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- ===================== NAVBAR ===================== -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 9C3 9 4.5 7 7 7C9.5 7 10.5 9 13 9C15.5 9 16.5 7 19 7C21.5 7 22 9 22 9"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M3 14C3 14 4.5 12 7 12C9.5 12 10.5 14 13 14C15.5 14 16.5 12 19 12C21.5 12 22 14 22 14"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="12" cy="5" r="2" fill="currentColor" opacity="0.5"/>
+                </svg>
+                <span>Weathify</span>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="/login.html" class="btn btn-outline">Log In</a>
+                <a href="/register.html" class="btn btn-primary">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===================== LANDING PAGE ===================== -->
+    <div id="landingPage">
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="container hero-container">
+
+                <div class="weather-icon-row">
+                    <!-- Sun -->
+                    <svg class="hero-weather-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M12 2V4M12 20V22M2 12H4M20 12H22M4.93 4.93L6.34 6.34M17.66 17.66L19.07 19.07M4.93 19.07L6.34 17.66M17.66 6.34L19.07 4.93"
+                              stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    <!-- Cloud -->
+                    <svg class="hero-weather-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.5 19C4.01 19 2 16.99 2 14.5C2 12.24 3.61 10.36 5.75 10.04C5.9 7.76 7.79 6 10.08 6C11.69 6 13.1 6.86 13.89 8.15C14.36 8.05 14.85 8 15.35 8C18.49 8 21 10.51 21 13.65C21 16.79 18.49 19 15.35 19H6.5Z"
+                              stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                    </svg>
+                    <!-- Rain -->
+                    <svg class="hero-weather-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.5 16C4.01 16 2 13.99 2 11.5C2 9.24 3.61 7.36 5.75 7.04C5.9 4.76 7.79 3 10.08 3C11.69 3 13.1 3.86 13.89 5.15C14.36 5.05 14.85 5 15.35 5C18.49 5 21 7.51 21 10.65C21 13.49 18.88 15.82 16.13 16H6.5Z"
+                              stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M8 19V21M12 19V21M16 19V21M10 21.5V22.5M14 21.5V22.5"
+                              stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    <!-- Snow -->
+                    <svg class="hero-weather-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2V22M12 2L9 5M12 2L15 5M12 22L9 19M12 22L15 19"
+                              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12H22M2 12L5 9M2 12L5 15M22 12L19 9M22 12L19 15"
+                              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <!-- Lightning -->
+                    <svg class="hero-weather-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13 2L4.5 13.5H11L10 22L20.5 9.5H14L13 2Z"
+                              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+
+                <h1 class="hero-title">
+                    Music That Matches<br>
+                    <span class="gradient-text">Your Weather</span>
+                </h1>
+
+                <p class="hero-subtitle">
+                    Weathify delivers contextual music recommendations based on<br class="hide-mobile">
+                    weather, time of day, and season. No black box AI, no hassle –<br class="hide-mobile">
+                    just the perfect soundtrack.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="/login.html" class="btn btn-primary btn-large">
+                        Start Listening
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M3 8H13M13 8L9 4M13 8L9 12"
+                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                    </button>
+                    <a href="/register.html" class="btn btn-outline btn-large">Create Account</a>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Why Weathify -->
+        <section class="why-section">
+            <div class="container">
+                <h2 class="section-title">Why <span class="gradient-text">Weathify</span>?</h2>
+                <p class="section-subtitle">Context-aware music discovery without the complexity.</p>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon feature-icon--purple">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6.5 16C4.01 16 2 13.99 2 11.5C2 9.24 3.61 7.36 5.75 7.04C5.9 4.76 7.79 3 10.08 3C11.69 3 13.1 3.86 13.89 5.15C14.36 5.05 14.85 5 15.35 5C18.49 5 21 7.51 21 10.65C21 13.49 18.88 15.82 16.13 16H6.5Z"
+                                      stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M8 19V21M12 19V21M16 19V21"
+                                      stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Weather-Aware</h3>
+                        <p class="feature-description">
+                            Automatically detects your local weather and matches the perfect soundtrack.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon feature-icon--pink">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 18V5L21 3V16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="1.5"/>
+                                <circle cx="18" cy="16" r="3" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Curated Moods</h3>
+                        <p class="feature-description">
+                            Hand-picked playlists for every weather condition – rain, shine, or snow.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon feature-icon--cyan">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z"
+                                      stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Instant Match</h3>
+                        <p class="feature-description">
+                            Get personalized recommendations in seconds with our context engine.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="how-section" id="howItWorks">
+            <div class="container">
+                <h2 class="section-title">How It <span class="gradient-text">Works</span></h2>
+
+                <div class="steps-grid">
+                    <div class="step">
+                        <div class="step-number">01</div>
+                        <h3 class="step-title">Select Your Mood</h3>
+                        <p class="step-description">
+                            Share your location and let Weathify do the magic. If you're concerned
+                            about your privacy do not worry, you can input your own weather!
+                        </p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">02</div>
+                        <h3 class="step-title">Get Matched</h3>
+                        <p class="step-description">
+                            Our engine finds songs tagged for your specific context.
+                        </p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">03</div>
+                        <h3 class="step-title">Enjoy</h3>
+                        <p class="step-description">
+                            Listen to perfectly matched tracks instantly.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="cta-box">
+                    <h3 class="cta-title">Ready to find your perfect soundtrack?</h3>
+                    <p class="cta-description">Join Weathify and discover music that fits your moment.</p>
+                    <a href="/register.html" class="btn btn-primary btn-large" id="getStartedBtn">
+                            Get Started!
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container footer-container">
+                <div class="footer-logo">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 9C3 9 4.5 7 7 7C9.5 7 10.5 9 13 9C15.5 9 16.5 7 19 7C21.5 7 22 9 22 9"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M3 14C3 14 4.5 12 7 12C9.5 12 10.5 14 13 14C15.5 14 16.5 12 19 12C21.5 12 22 14 22 14"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span>Weathify</span>
+                </div>
+                <div class="footer-copy">© 2025 Weathify. All rights reserved.</div>
+                <div class="footer-links">
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Contact</a>
+                </div>
+            </div>
+        </footer>
+
+    </div><!-- /landingPage -->
+
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <div id="dashboardPage" class="hidden">
+
+        <!-- Dashboard Navbar (replaces landing navbar) -->
+        <nav class="navbar">
+            <div class="container nav-container">
+                <div class="logo">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 9C3 9 4.5 7 7 7C9.5 7 10.5 9 13 9C15.5 9 16.5 7 19 7C21.5 7 22 9 22 9"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M3 14C3 14 4.5 12 7 12C9.5 12 10.5 14 13 14C15.5 14 16.5 12 19 12C21.5 12 22 14 22 14"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span>Weathify</span>
+                </div>
+                <div class="nav-links">
+                    <span class="user-greeting" id="userGreeting"></span>
+                    <button class="btn btn-outline btn-sm" id="logoutBtn">Log Out</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="dashboard-wrap container">
+
+            <!-- Weather Card -->
+            <div class="weather-card" id="weatherCard">
+                <div class="weather-card__left">
+                    <div class="weather-icon-large" id="weatherIconLarge">
+                        <!-- Injected by JS -->
+                    </div>
+                    <div>
+                        <div class="weather-condition" id="weatherConditionText">Detecting weather…</div>
+                        <div class="weather-location" id="weatherLocationText"></div>
+                    </div>
+                </div>
+                <div class="weather-card__right">
+                    <div class="weather-temp" id="weatherTempText"></div>
+                    <div class="weather-context-badges" id="weatherContextBadges"></div>
+                </div>
+            </div>
+
+            <!-- Manual Override -->
+            <div class="manual-bar">
+                <span class="manual-bar__label">Not right?</span>
+                <button class="btn btn-outline btn-sm" id="manualWeatherBtn">Set weather manually</button>
+                <button class="btn btn-outline btn-sm" id="refreshBtn">↻ Refresh</button>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="recommendations-header">
+                <h2 class="rec-title">Your Soundtrack</h2>
+                <p class="rec-explanation" id="recExplanation"></p>
+            </div>
+
+            <div class="songs-grid" id="songsGrid">
+                <!-- Song cards injected by JS -->
+                <div class="loading-state" id="loadingState">
+                    <div class="spinner"></div>
+                    <p>Finding your perfect tracks…</p>
+                </div>
+            </div>
+
+        </div>
+    </div><!-- /dashboardPage -->
+
+
+    <!-- ===================== MANUAL WEATHER MODAL ===================== -->
+    <div class="modal-overlay hidden" id="manualModal">
+        <div class="modal-box">
+            <button class="modal-close" id="closeManualModal">&times;</button>
+            <h2 class="modal-title">Set Weather Manually</h2>
+            <p class="modal-subtitle">Choose your current conditions to get matching music.</p>
+
+            <form id="manualWeatherForm" class="modal-form">
+                <div class="form-group">
+                    <label for="selectWeather">Weather</label>
+                    <select id="selectWeather" required>
+                        <option value="">— Select weather —</option>
+                        <option value="sunny">☀️  Sunny</option>
+                        <option value="cloudy">☁️  Cloudy</option>
+                        <option value="rainy">🌧️  Rainy</option>
+                        <option value="snowy">❄️  Snowy</option>
+                        <option value="stormy">⛈️  Stormy</option>
+                        <option value="foggy">🌫️  Foggy</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="selectSeason">Season</label>
+                    <select id="selectSeason" required>
+                        <option value="">— Select season —</option>
+                        <option value="spring">🌸  Spring</option>
+                        <option value="summer">🌞  Summer</option>
+                        <option value="autumn">🍂  Autumn</option>
+                        <option value="winter">🌨️  Winter</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="selectTime">Time of Day</label>
+                    <select id="selectTime" required>
+                        <option value="">— Select time —</option>
+                        <option value="morning">🌅  Morning</option>
+                        <option value="afternoon">🌤️  Afternoon</option>
+                        <option value="evening">🌆  Evening</option>
+                        <option value="night">🌙  Night</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" id="cancelManualBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Get Recommendations</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
