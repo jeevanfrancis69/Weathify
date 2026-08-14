@@ -13,15 +13,15 @@ const adminRoutes         = require('./routes/admin');
 const spotifyRoutes       = require('./routes/spotify');
 
 const app  = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 // ── 1. Security headers ──────────────────────────────────────
 app.use(helmet({ contentSecurityPolicy: false }));
 
 // ── 2. CORS ──────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
-  'http://127.0.0.1:3000',
-  'http://localhost:3000',
+  'http://127.0.0.1:5000',
+  'http://localhost:5000',
 ];
 
 if (process.env.FRONTEND_URL) {
