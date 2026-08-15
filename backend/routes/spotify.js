@@ -3,6 +3,7 @@ const router = express.Router();
 const axios = require('axios');
 const { authenticateUser } = require('../middleware/auth');
 const { query } = require('../config/database');
+const { getAccessTokenUserAuth } = require('../services/spotifyService');
 
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
@@ -14,6 +15,7 @@ const SCOPES = [
   'user-read-private',
   'user-modify-playback-state',
   'user-read-playback-state',
+  'user-top-read'
 ].join(' ');
 
 // ── Redirect user to Spotify authorization ────────────────────
@@ -100,63 +102,86 @@ async function spotifyCallbackHandler(req, res) {
 router.get('/callback', spotifyCallbackHandler);
 
 // ── Get current user's Spotify access token ───────────────────
-router.get('/token', authenticateUser, async (req, res) => {
+router.get('/token', authenticateUser, async (req,res) => {
+  const userID = req.user.id;
+  const access_token = await getAccessTokenUserAuth(userID);
+
+  if (access_token === null) {
+    console.log("[Spotify | Routes] Could not get user's Spotify token");
+    return res.status(500).json({ error: 'Failed to get Spotify token' , connected:false});
+  }
+
+  return res.json({access_token, connected:true})
+});
+
+
+
+// Get Spotify user profile data //
+router.get('/profile', authenticateUser , async (req, res) => {
   try {
-    const result = await query(
-      'SELECT access_token, refresh_token, expires_at FROM spotify_tokens WHERE user_id = $1',
-      [req.user.id]
-    );
+    const userID = req.user.id;
+    const access_token = await getAccessTokenUserAuth(userID);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Spotify not connected', connected: false });
+    if (!access_token) {
+      return res.status(403).json({error : 'Could not find Spotify token'});
     }
 
-    let { access_token, refresh_token, expires_at } = result.rows[0];
+    const profileData = await axios.get("https://api.spotify.com/v1/me", {
+      headers : {Authorization: `Bearer ${access_token}`}
+    });
 
-    // Refresh if expired (or expiring within 60s)
-    if (new Date(expires_at) <= new Date(Date.now() + 60000)) {
-      console.log('[Spotify Token] Refreshing expired token for user:', req.user.id);
-      try {
-        const refreshResponse = await axios.post(
-          'https://accounts.spotify.com/api/token',
-          new URLSearchParams({
-            grant_type: 'refresh_token',
-            refresh_token,
-          }).toString(),
-          {
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-              Authorization: `Basic ${Buffer.from(
-                `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`
-              ).toString('base64')}`,
-            },
-          }
-        );
+    const responseCode = profileData.status;
+    return res.json(profileData.data);
 
-        access_token = refreshResponse.data.access_token;
-        const newExpiresAt = new Date(Date.now() + refreshResponse.data.expires_in * 1000);
-        const newRefreshToken = refreshResponse.data.refresh_token || refresh_token;
-
-        await query(
-          `UPDATE spotify_tokens 
-           SET access_token = $1, refresh_token = $2, expires_at = $3, updated_at = NOW()
-           WHERE user_id = $4`,
-          [access_token, newRefreshToken, newExpiresAt, req.user.id]
-        );
-      } catch (refreshError) {
-        console.error('[Spotify Token] Refresh failed:', refreshError.response?.data || refreshError.message);
-        // Delete invalid tokens
-        await query('DELETE FROM spotify_tokens WHERE user_id = $1', [req.user.id]);
-        return res.status(401).json({ error: 'Spotify session expired. Please reconnect.', connected: false });
-      }
+  } catch(error) {
+    const status = error.response?.status;
+    switch (status) {
+      case 401:
+        return res.status(401).json({error : "Bad or expired token"});
+      case 403:
+        return res.status(403).json({error : "Bad OAuth request"});
+      case 429:
+        return res.status(429).json({error : "Rate limits exceeded"});
+      default:
+        console.error("[Spotify | Routes] Could not get user's profile :(" , error.message)
+        return res.status(500).json({error: "Something went wrong fetching profile"});
     }
-
-    return res.json({ access_token, connected: true });
-  } catch (error) {
-    console.error('[Spotify Token] Error:', error);
-    return res.status(500).json({ error: 'Failed to get Spotify token' });
   }
 });
+
+// Get Spotify user top items//
+router.get('/topitems', authenticateUser , async (req, res) => {
+  try {
+    const userID = req.user.id;
+    const access_token = await getAccessTokenUserAuth(userID);
+
+    if (!access_token) {
+      return res.status(403).json({error : 'Could not find Spotify token'});
+    }
+
+    const response = await axios.get("https://api.spotify.com/v1/me/top/artists", {
+      headers : {Authorization: `Bearer ${access_token}`}
+    });
+
+    const responseCode = response.status;
+    return res.json(response.data);
+
+  } catch(error) {
+    const status = error.response?.status;
+    switch (status) {
+      case 401:
+        return res.status(401).json({error : "Bad or expired token"});
+      case 403:
+        return res.status(403).json({error : "Bad OAuth request"});
+      case 429:
+        return res.status(429).json({error : "Rate limits exceeded"});
+      default:
+        console.error("[Spotify | Routes] Could not get user's top items :(" , error.message)
+        return res.status(500).json({error: "Something went wrong fetching user's top items"});
+    }
+  }
+});
+
 
 // ── Disconnect Spotify ────────────────────────────────────────
 router.delete('/disconnect', authenticateUser, async (req, res) => {
