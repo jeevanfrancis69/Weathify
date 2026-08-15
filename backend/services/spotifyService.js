@@ -10,7 +10,7 @@ class SpotifyService {
   }
 
   // Get Spotify access token (Client Credentials Flow)
-  async getAccessToken() {
+  async getAccessTokenAppAuth() {
     if (this.accessToken && this.tokenExpiry && Date.now() < this.tokenExpiry) {
       return this.accessToken;
     }
@@ -41,7 +41,7 @@ class SpotifyService {
   // Search for tracks by query
   async searchTracks(query, limit = 20) {
     try {
-      const token = await this.getAccessToken();
+      const token = await this.getAccessTokenAppAuth();
       const response = await axios.get('https://api.spotify.com/v1/search', {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -75,7 +75,7 @@ class SpotifyService {
   // Get track by ID
   async getTrack(trackId) {
     try {
-      const token = await this.getAccessToken();
+      const token = await this.getAccessTokenAppAuth();
       const response = await axios.get(`https://api.spotify.com/v1/tracks/${trackId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -105,7 +105,7 @@ class SpotifyService {
   // Get recommendations based on seed tracks
   async getRecommendations(seedTracks, limit = 20) {
     try {
-      const token = await this.getAccessToken();
+      const token = await this.getAccessTokenAppAuth();
       const response = await axios.get('https://api.spotify.com/v1/recommendations', {
         headers: {
           Authorization: `Bearer ${token}`,
