@@ -1,4 +1,4 @@
-type WeatherIconProps = { type: string }
+type WeatherIconProps = { type: string | null}
 //an object with property type that has String data type is passed down here
 
 
