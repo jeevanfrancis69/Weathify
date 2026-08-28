@@ -2,32 +2,40 @@
 
 
 import type { WeatherData, WeatherContext } from "@/types/Weather";
-import WeatherIcon from "@/app/dashboard/WeatherIcon";
+import WeatherIcon from "@/components/dashboard/WeatherIcon";
 import weatherEmoji from "@/types/WeatherEmoji";
 
 type WeatherCardProps = {
-    context: WeatherContext;
-    data: WeatherData
+    context: WeatherContext | null;
+    data: WeatherData | null ;
     onManualClick: () => void;
     onRefreshClick: () => void;
 };
 
-function cap(s: string) {
+
+function cap(s: string | null) {
     return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
 }
 
-export default function WeatherCard( props: WeatherCardProps ) {
+export default function WeatherCard( props: WeatherCardProps) {
     const { context, data, onManualClick, onRefreshClick } = props;
+
     return (
         <>
             <div className="weather-card" id="Card">
                 <div className="weather-card__left">
                     <div className="weather-icon-large" id="weatherIconLarge">
-                        <WeatherIcon type={context.weather}/>
+                        { context && (
+                            <WeatherIcon type={context.weather}/>
+                        )}
                     </div>
                     <div>
                         <div className="weather-condition" id="weatherConditionText">
-                            {weatherEmoji(context.weather)} {cap(context.weather)}
+                            {context && (
+                                <>
+                                {weatherEmoji(context.weather)} {cap(context.weather)}
+                                </>
+                            )}
                         </div>
                         <div className="weather-location" id="weatherLocationText">
                             {data ? `${data.city}, ${data.country}` : "Manual selection"}
@@ -41,7 +49,7 @@ export default function WeatherCard( props: WeatherCardProps ) {
                         : '-'}
                     </div>
                     <div className="weather-context-badges" id="weatherContextBadges">
-                        {[context.season, context.time_of_day].filter(Boolean).map(v => `<span class = "context-badge"> ${cap(v)}</span>>`).join('')}
+                        {context && [context.season, context.time_of_day].filter(Boolean).map(v => `<span class = "context-badge"> ${cap(v)}</span>>`).join('')}
 
                     </div>
                 </div>

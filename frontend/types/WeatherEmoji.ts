@@ -1,5 +1,5 @@
 
-export default function weatherEmoji ( weatherName:string) {
+export default function weatherEmoji ( weatherName:string | null) {
     switch (weatherName) {
         case "sunny":
             return '☀️'
