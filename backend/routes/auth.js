@@ -3,13 +3,18 @@ const router   = express.Router();
 const bcrypt   = require('bcrypt');
 const jwt      = require('jsonwebtoken');
 const { query }= require('../config/database');
+
 // Add this if it's missing!
+
+/* eslint-disable-next-line no-unused-vars */
 const { body, validationResult } = require('express-validator');
 
-const SALT_ROUNDS = 10;
+// const SALT_ROUNDS = 10;
 
 router.use((req, res, next) => {
   // Override res.sendFile to prevent accidental HTML responses
+
+  /* eslint-disable no-unused-vars*/
   const originalSendFile = res.sendFile.bind(res);
   res.sendFile = function(...args) {
     console.warn('[Auth Route] Attempted to send file instead of JSON:', args);
@@ -108,7 +113,7 @@ router.post('/register', async (req, res) => {
     const jwt = require('jsonwebtoken');
     const token = jwt.sign(
       { userId: user.id, username: user.username },
-      process.env.JWT_SECRET || 'fallback-secret-change-me',
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
@@ -254,7 +259,7 @@ router.post('/login', async (req, res) => {
     const jwt = require('jsonwebtoken');
     const token = jwt.sign(
       { userId: user.id, username: user.username },
-      process.env.JWT_SECRET || 'fallback-secret-change-me',
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 

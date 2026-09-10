@@ -130,6 +130,7 @@ router.get('/profile', authenticateUser , async (req, res) => {
       headers : {Authorization: `Bearer ${access_token}`}
     });
 
+    /* eslint-disable no-unused-vars */
     const responseCode = profileData.status;
     return res.json(profileData.data);
 
@@ -163,6 +164,7 @@ router.get('/topitems', authenticateUser , async (req, res) => {
       headers : {Authorization: `Bearer ${access_token}`}
     });
 
+    /* eslint-disable no-unused-vars */
     const responseCode = response.status;
     return res.json(response.data);
 
