@@ -21,23 +21,20 @@ app.use(helmet({ contentSecurityPolicy: false }));
 // ── 2. CORS ──────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
   'http://127.0.0.1:5000',
-  'http://localhost:5000',
+  'http://localhost:3000',
 ];
 
 if (process.env.FRONTEND_URL) {
   ALLOWED_ORIGINS.push(process.env.FRONTEND_URL.replace(/\/$/, ''));
 }
 
-if (process.env.NODE_ENV === 'production' && process.env.FRONTEND_URL) {
-  const cors = require('cors');
-  app.use(cors({
-    origin:      process.env.FRONTEND_URL,
+app.use(cors({
+    origin:      ALLOWED_ORIGINS,
     credentials: true,
     methods:     ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-  }));
-  app.options('*', cors());
-}
+}));
+
 
 // ── 3. Rate limiter (API only) ───────────────────────────────
 const limiter = rateLimit({
@@ -128,7 +125,7 @@ app.get('*', (req, res) => {
 });
 
 // ── 10. Error handler ────────────────────────────────────────
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   console.error('[Server Error]', err.message);
   res.status(err.status || 500).json({
     error: err.message || 'Internal server error',
