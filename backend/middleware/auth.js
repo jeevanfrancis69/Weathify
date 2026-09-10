@@ -86,6 +86,7 @@ const optionalAuth = async (req, res, next) => {
     
     next();
   } catch (error) {
+    console.error('Optional admin authentication error' , error)
     // Continue without authentication
     next();
   }
