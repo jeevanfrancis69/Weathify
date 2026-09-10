@@ -22,7 +22,7 @@ class WeatherService {
       return this.formatWeatherData(response.data);
     } catch (error) {
       console.error('Error fetching weather by coordinates:', error.response?.data || error.message);
-      throw new Error('Failed to fetch weather data');
+      throw new Error('Failed to fetch weather data' , {cause: error});
     }
   }
 
@@ -40,7 +40,7 @@ class WeatherService {
       return this.formatWeatherData(response.data);
     } catch (error) {
       console.error('Error fetching weather by city:', error.response?.data || error.message);
-      throw new Error('Failed to fetch weather data');
+      throw new Error('Failed to fetch weather data' , {cause : error});
     }
   }
 

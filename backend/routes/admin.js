@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { query, transaction } = require('../config/database');
+const { query } = require('../config/database');
 const { authenticateAdmin, requireAdminRole } = require('../middleware/auth');
 const spotifyService = require('../services/spotifyService');
 const analyticsService = require('../services/analyticsService');
