@@ -49,8 +49,7 @@ export default function WeatherCard( props: WeatherCardProps) {
                         : '-'}
                     </div>
                     <div className="weather-context-badges" id="weatherContextBadges">
-                        {context && [context.season, context.time_of_day].filter(Boolean).map(v => `<span class = "context-badge"> ${cap(v)}</span>>`).join('')}
-
+                        {context && [context.season, context.time_of_day].filter(Boolean).map((v, i) => (<span key={i} className={"context-badge"}>{cap(v)}</span> ))}
                     </div>
                 </div>
             </div>
