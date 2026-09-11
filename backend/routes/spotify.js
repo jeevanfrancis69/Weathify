@@ -42,11 +42,11 @@ async function spotifyCallbackHandler(req, res) {
 
   if (error) {
     console.error('[Spotify OAuth] Authorization error:', error);
-    return res.redirect('/dashboard.html?spotify_error=' + encodeURIComponent(error));
+    return res.redirect(`${process.env.FRONTEND_URL}/dashboard?spotify_error= + encodeURIComponent(error)`);
   }
 
   if (!code || !state) {
-    return res.redirect('/dashboard.html?spotify_error=missing_params');
+    return res.redirect(`${process.env.FRONTEND_URL}/dashboard?spotify_error=missing_params`);
   }
 
   let userId;
@@ -55,7 +55,7 @@ async function spotifyCallbackHandler(req, res) {
     userId = decoded.userId;
   } catch (e) {
     console.error('[Spotify OAuth] Invalid state:', e);
-    return res.redirect('/dashboard.html?spotify_error=invalid_state');
+    return res.redirect(`${process.env.FRONTEND_URL}/dashboard?spotify_error=invalid_state`);
   }
 
   try {
@@ -90,10 +90,10 @@ async function spotifyCallbackHandler(req, res) {
     );
 
     console.log('[Spotify OAuth] Tokens stored for user:', userId);
-    return res.redirect('/dashboard.html?spotify_connected=true');
+    return res.redirect(`${process.env.FRONTEND_URL}/dashboard?spotify_connected=true`);
   } catch (err) {
     console.error('[Spotify OAuth] Token exchange error:', err.response?.data || err.message);
-    return res.redirect('/dashboard.html?spotify_error=token_exchange_failed');
+    return res.redirect(`${process.env.FRONTEND_URL}/dashboard?spotify_error=token_exchange_failed`);
   }
 }
 
