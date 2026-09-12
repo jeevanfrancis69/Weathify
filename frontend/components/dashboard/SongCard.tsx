@@ -6,17 +6,19 @@ type SongCardProps = {
     song: Song;
     isLiked: boolean;
     view: 'grid' | 'table';
+    index?: number;
     onLike: (song: Song) => void;
     onPlay: (song: Song) => void;
 };
 
 export default function SongCard( props: SongCardProps) {
-    const { song, isLiked, onLike, onPlay, view } = props
+    const { song, isLiked, onLike, onPlay, view, index = 0 } = props
     const tags = (song.matched_tags || []).filter(Boolean).slice(0, 3);
 
     if (view === 'table') {
         return (
             <div className="songs-table__row">
+                <span className="songs-table__cell songs-table__cell--num">{index + 1}</span>
                 <span className="songs-table__cell songs-table__cell--title">
                     <img
                         className="songs-table__art"
