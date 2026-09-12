@@ -1,7 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import SpotifyPlayer from 'react-spotify-web-playback';
+import { toast } from 'sonner';
 import { UserAuth } from '@/hooks/UserAuth';
 import type { Song } from '@/types/Song';
 import type { WeatherContext, WeatherData } from '@/types/Weather';
@@ -24,6 +26,14 @@ type ManualWeatherValues = {
     season: NonNullable<WeatherContext['season']>;
     time_of_day: NonNullable<WeatherContext['time_of_day']>;
 };
+
+function toSpotifyTrackUris(trackId: string): string[] {
+    const input = String(trackId || '').trim();
+    const match = input.match(/(?:open\.spotify\.com\/track\/|spotify:track:)([a-zA-Z0-9]+)/i);
+    const cleanId = (match ? match[1] : input).replace(/[^a-zA-Z0-9]/g, '');
+
+    return cleanId ? [`spotify:track:${cleanId}`] : [];
+}
 
 async function readJsonResponse(response: Response): Promise<RecommendationResponse> {
     const contentType = response.headers.get('content-type');
@@ -60,6 +70,40 @@ export default function DashboardPage() {
     const [weatherContext, setWeatherContext] = useState<WeatherContext | null>(null);
     const [showManualModal, setShowManualModal] = useState(false);
     const [showAll, setShowAll] = useState(false);
+    const [spotifyToken, setSpotifyToken] = useState<string | null>(null);
+    const [spotifyConnected, setSpotifyConnected] = useState(false);
+    const [activeTrackUris, setActiveTrackUris] = useState<string[]>([]);
+    const [activeSongIndex, setActiveSongIndex] = useState(-1);
+    const activeTrackRef = useRef<Song | null>(null);
+    const activeSongIndexRef = useRef(-1);
+    const autoAdvancedTrackRef = useRef<string | null>(null);
+    const premiumToastShown = useRef(false);
+
+    useEffect(() => {
+        async function loadSpotifyToken() {
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/api/spotify/token`, {
+                    credentials: 'include',
+                });
+                const data = await response.json() as { access_token?: string; connected?: boolean };
+
+                if (!response.ok) {
+                    throw new Error(data.connected === false ? 'Spotify is not connected.' : `HTTP ${response.status}`);
+                }
+
+                if (data.connected && data.access_token) {
+                    console.log("[Load Spot Token: Access Token and Spotify is Connected]")
+                    setSpotifyToken(data.access_token);
+                    setSpotifyConnected(true);
+                }
+            } catch (error) {
+                console.error('[Dashboard] Could not load Spotify token:', error);
+                toast.error('We could not check your Spotify connection. You can still open songs in Spotify.');
+            }
+        }
+
+        void loadSpotifyToken();
+    }, []);
 
     useEffect(() => {
         if (!authLoading && (authError || !user)) {
@@ -77,6 +121,31 @@ export default function DashboardPage() {
             document.body.style.overflow = '';
         };
     }, [showManualModal]);
+
+    const spotifyPlayerWrapperRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const wrapper = spotifyPlayerWrapperRef.current;
+        if (!wrapper) return;
+
+        const hideNativeSkipButtons = () => {
+            wrapper.querySelectorAll('button').forEach((btn) => {
+                if (!btn.classList.contains('rswp__toggle')) {
+                    btn.style.display = 'none';
+                }
+            });
+        };
+
+        hideNativeSkipButtons();
+
+        // SpotifyPlayer re-renders its internals on progress/track updates,
+        // so keep re-hiding whenever the DOM inside the wrapper changes.
+        const observer = new MutationObserver(hideNativeSkipButtons);
+        observer.observe(wrapper, { childList: true, subtree: true });
+
+        return () => observer.disconnect();
+    }, [activeTrackUris]);
+
 
     const updateRecommendationState = useCallback((data: RecommendationResponse) => {
         const nextSongs = data.songs || [];
@@ -277,12 +346,103 @@ export default function DashboardPage() {
         }
     }
 
+    const handlePlaySong = useCallback((trackId: string, song: Song) => {
+        const uris = toSpotifyTrackUris(trackId);
+        if (!uris.length) {
+            toast.error('This song has an invalid Spotify track ID.');
+            return;
+        }
+
+        premiumToastShown.current = false;
+
+        if (!spotifyConnected || !spotifyToken) {
+            toast.error('Connect your Spotify account for in-app playback.');
+            window.open(song.spotify_url, '_blank', 'noopener,noreferrer');
+            return;
+        }
+
+        setActiveTrackUris(uris); // launches the Web Player SDK
+        activeTrackRef.current = song;
+    }, [spotifyConnected, spotifyToken]);
+
     function handlePlay(song: Song) {
         const index = songs.findIndex((item) => item.id === song.id);
         localStorage.setItem('playerQueue', JSON.stringify(songs));
         localStorage.setItem('playerQueueIndex', String(index));
         localStorage.setItem('playerQueueSource', 'dashboard');
-        window.open(song.spotify_url, '_blank', 'noopener,noreferrer');
+        activeSongIndexRef.current = index;
+        setActiveSongIndex(index);
+        autoAdvancedTrackRef.current = null;
+        handlePlaySong(song.spotify_track_id, song);
+    }
+
+    const playNextSong = useCallback(() => {
+        if (!songs.length) {
+            return;
+        }
+
+        const currentIndex = activeSongIndexRef.current >= 0 ? activeSongIndexRef.current : activeSongIndex;
+        const nextIndex = (currentIndex + 1 + songs.length) % songs.length;
+        const nextSong = songs[nextIndex];
+        activeSongIndexRef.current = nextIndex;
+        setActiveSongIndex(nextIndex);
+        handlePlaySong(nextSong.spotify_track_id, nextSong);
+    }, [activeSongIndex, handlePlaySong, songs]);
+
+    const playPreviousSong = useCallback(() => {
+        if (!songs.length) {
+            return;
+        }
+
+        const currentIndex = activeSongIndexRef.current >= 0 ? activeSongIndexRef.current : activeSongIndex;
+        const previousIndex = (currentIndex - 1 + songs.length) % songs.length;
+        const previousSong = songs[previousIndex];
+        activeSongIndexRef.current = previousIndex;
+        setActiveSongIndex(previousIndex);
+        handlePlaySong(previousSong.spotify_track_id, previousSong);
+    }, [activeSongIndex, handlePlaySong, songs]);
+
+    function handlePlayerCallback(state: {
+        status: string;
+        errorType?: string | null;
+        error?: string;
+        progressMs?: number;
+        track?: { id: string; durationMs: number };
+    }) {
+        if (state.status !== 'ERROR') {
+            const trackId = state.track?.id;
+            const durationMs = state.track?.durationMs || 0;
+            const hasReachedEnd = Boolean(
+                trackId
+                && durationMs > 0
+                && (state.progressMs || 0) >= durationMs - 1000,
+            );
+
+            if (trackId && hasReachedEnd && autoAdvancedTrackRef.current !== trackId) {
+                autoAdvancedTrackRef.current = trackId;
+                playNextSong();
+            }
+
+            return;
+        }
+
+        const isPremiumError = state.errorType === 'account'
+            || state.errorType === 'authentication'
+            || /premium|account|authentication/i.test(state.error || '');
+
+        if (isPremiumError) {
+            if (!premiumToastShown.current) {
+                toast.error('Spotify Premium is required for interactive playback. Opening this song in Spotify.');
+                premiumToastShown.current = true;
+            }
+            setActiveTrackUris([]);
+            const track = activeTrackRef.current;
+            if (track) {
+                window.open(track.spotify_url, '_blank', 'noopener,noreferrer');
+            }
+        } else {
+            toast.error(state.error || 'Spotify playback failed.');
+        }
     }
 
     function handleManualSubmit(values: ManualWeatherValues) {
@@ -302,7 +462,7 @@ export default function DashboardPage() {
             <link rel="stylesheet" href="/css/dashboard.css" />
             <link rel="stylesheet" href="/css/player.css" />
 
-            <Navbar user={user} onLogout={() => void handleLogout()} />
+            <Navbar user={user} spotifyConnected={spotifyConnected} setSpotifyConnected = {setSpotifyConnected} onLogout={() => void handleLogout()} />
 
             <main className="dashboard-wrap container">
                 <WeatherCard
@@ -327,6 +487,127 @@ export default function DashboardPage() {
                     onManualClick={() => setShowManualModal(true)}
                 />
             </main>
+
+            {spotifyToken && activeTrackUris.length > 0 && (
+                <>
+                    {/* Your preferred layout container bar */}
+                    <div
+                        style={{
+                            position: 'fixed',
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            width: '100%',
+                            zIndex: 1000,
+                            background: '#0d0d17',
+                            boxShadow: '0 -2px 10px rgba(0,0,0,0.5)',
+                            boxSizing: 'border-box',
+                            padding: '0 24px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                    >
+                        <div
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                width: '100%',
+                                height: '90px',
+                                gap: '16px'
+                            }}
+                        >
+                            {/* COLUMN 1: Your custom far-left Previous button */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <button
+                                    type="button"
+                                    aria-label="Previous song"
+                                    title="Previous song"
+                                    onClick={playPreviousSong}
+                                    disabled={!songs.length}
+                                    style={{
+                                        border: 0,
+                                        borderRadius: '999px',
+                                        padding: '10px',
+                                        color: '#fff',
+                                        background: '#2a2a3a',
+                                        cursor: songs.length ? 'pointer' : 'not-allowed',
+                                        opacity: songs.length ? 1 : 0.5,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        transition: 'all 0.2s ease',
+                                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                    }}
+                                    onMouseOver={(e) => { if(songs.length) e.currentTarget.style.background = '#3e3e56'; }}
+                                    onMouseOut={(e) => { if(songs.length) e.currentTarget.style.background = '#2a2a3a'; }}
+                                >
+                                    <svg xmlns="http://w3.org" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                        <rect x="4" y="5" width="2" height="14" rx="1" />
+                                        <path d="M19 19V5l-11 7z" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* COLUMN 2: The Core SDK Timeline & Center Play Button */}
+                            <div className="spotify-player-wrapper" ref={spotifyPlayerWrapperRef} style={{ flex: 1, minWidth: 0 }}>
+                                <SpotifyPlayer
+                                    token={spotifyToken}
+                                    uris={activeTrackUris}
+                                    play
+                                    layout="responsive"
+                                    callback={handlePlayerCallback}
+                                    hideAttribution
+                                    styles={{
+                                        bgColor: '#0d0d17',
+                                        color: '#fff',
+                                        sliderColor: '#a78bfa',
+                                        sliderTrackColor: '#2a2a3a',
+                                        trackNameColor: '#fff',
+                                        trackArtistColor: '#9ca3af',
+                                        loaderColor: '#a78bfa',
+                                        activeColor: '#a78bfa',
+                                        height: 90,
+                                    }}
+                                />
+                            </div>
+
+                            {/* COLUMN 3: Your custom far-right Next button */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <button
+                                    type="button"
+                                    aria-label="Next song"
+                                    title="Next song"
+                                    onClick={playNextSong}
+                                    disabled={!songs.length}
+                                    style={{
+                                        border: 0,
+                                        borderRadius: '999px',
+                                        padding: '10px',
+                                        color: '#fff',
+                                        background: '#2a2a3a',
+                                        cursor: songs.length ? 'pointer' : 'not-allowed',
+                                        opacity: songs.length ? 1 : 0.5,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        transition: 'all 0.2s ease',
+                                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                    }}
+                                    onMouseOver={(e) => { if(songs.length) e.currentTarget.style.background = '#3e3e56'; }}
+                                    onMouseOut={(e) => { if(songs.length) e.currentTarget.style.background = '#2a2a3a'; }}
+                                >
+                                    <svg xmlns="http://w3.org" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M5 5v14l11-7z" />
+                                        <rect x="18" y="5" width="2" height="14" rx="1" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </>
+            )}
 
             {showManualModal && (
                 <ManualWeatherModal

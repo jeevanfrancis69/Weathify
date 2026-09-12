@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -105,7 +106,7 @@ export default function LoginPage() {
       <link rel="stylesheet" href="/css/auth.css" />
 
       <header className="auth-header">
-        <a href="/" className="auth-header__logo">
+        <Link href="/" className="auth-header__logo">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
             <path
               d="M3 9C3 9 4.5 7 7 7C9.5 7 10.5 9 13 9C15.5 9 16.5 7 19 7C21.5 7 22 9 22 9"
@@ -121,7 +122,7 @@ export default function LoginPage() {
             />
           </svg>
           <span>Weathify</span>
-        </a>
+        </Link>
       </header>
 
       <div className="auth-container">
@@ -176,7 +177,7 @@ export default function LoginPage() {
           </form>
 
           <div className="auth-footer">
-            Don&apos;t have an account? <a href="/register.html">Create one</a>
+            Don&apos;t have an account? <a href="/register">Create one</a>
           </div>
         </div>
       </div>
