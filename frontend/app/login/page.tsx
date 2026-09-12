@@ -177,7 +177,7 @@ export default function LoginPage() {
           </form>
 
           <div className="auth-footer">
-            Don&apos;t have an account? <a href="/register.html">Create one</a>
+            Don&apos;t have an account? <a href="/register">Create one</a>
           </div>
         </div>
       </div>
