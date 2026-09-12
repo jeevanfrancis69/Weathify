@@ -1,4 +1,9 @@
-import {User} from "@/types/User"
+'use client';
+
+import { User } from "@/types/User";
+
+import {Suspense, useState} from "react";
+import SpotifyCallbackHandler from "@/components/dashboard/SpotifyAuthHandler";
 
 
 function WeathifyLogo() {
@@ -30,13 +35,20 @@ function Profile() {
                 <circle cx="12" cy="7" r="4"/>
                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
             </svg>
+            Profile
         </a>
     )
 }
 
+type NavbarProps = {
+    user: User;
+    onLogout: () => void;
+    spotifyConnected: boolean;
+    setSpotifyConnected: (value: boolean) => void;
+};
 
-export default function Navbar(users: User | null ) {
-    const firstName = users?.full_name ? users.full_name.split(' ')[0] : '';
+export default function Navbar({ user, onLogout, spotifyConnected, setSpotifyConnected }: NavbarProps) {
+    const firstName = user.full_name ? user.full_name.split(' ')[0] : user.username;
 
     return(
         <nav className="navbar">
@@ -57,14 +69,28 @@ export default function Navbar(users: User | null ) {
                         Playlist
                     </a>
                     {/* Connect Spotify Button */}
-                    <a href={`${process.env.NEXT_PUBLIC_API_URL}/api/spotify/login`} className="btn btn-spotify btn-sm" id="spotifyConnectBtn" title="Connect your Spotify account for in-app playback">
+                    <a href={spotifyConnected ? undefined :`${process.env.NEXT_PUBLIC_EXPRESS_API_URL}/api/spotify/login`}
+                       className={`btn btn-spotify btn-sm ${spotifyConnected ? 'btn-spotify--connected' : ''}`}
+                       id="spotifyConnectBtn"
+                       title={ spotifyConnected ? 'Spotify is connected!' : "Connect your Spotify account for in-app playback"}
+                       style={{cursor: spotifyConnected ? 'default' : 'pointer'}}
+                       onClick={(e) => {
+                           if (spotifyConnected) e.preventDefault()
+                       }}
+                    >
                         <SpotifyLogo/>
-                        <span id="spotifyBtnText">Connect Spotify</span>
+                        <span id="spotifyBtnText">
+                            {spotifyConnected ? "Spotify Connected" : "Connect Spotify"}
+                        </span>
                     </a>
+                    <Suspense fallback={null}>
+                        <SpotifyCallbackHandler onConnectionSuccess = {() => setSpotifyConnected(true)}/>
+                    </Suspense>
+
                     <span className="user-greeting" id="userGreeting">
-                        {users ? `Hi, ${firstName} 👋` : `Log In yo`}
+                        {`Hi, ${firstName} 👋`}
                     </span>
-                    <button className="btn btn-outline btn-sm" id="logoutBtn">Log Out</button>
+                    <button className="btn btn-outline btn-sm" id="logoutBtn" onClick={onLogout}>Log Out</button>
                 </div>
             </div>
         </nav>
