@@ -1,7 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import SpotifyPlayer from 'react-spotify-web-playback';
+import { toast } from 'sonner';
 import { UserAuth } from '@/hooks/UserAuth';
 import type { Song } from '@/types/Song';
 import type { WeatherContext, WeatherData } from '@/types/Weather';
@@ -119,6 +121,31 @@ export default function DashboardPage() {
             document.body.style.overflow = '';
         };
     }, [showManualModal]);
+
+    const spotifyPlayerWrapperRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const wrapper = spotifyPlayerWrapperRef.current;
+        if (!wrapper) return;
+
+        const hideNativeSkipButtons = () => {
+            wrapper.querySelectorAll('button').forEach((btn) => {
+                if (!btn.classList.contains('rswp__toggle')) {
+                    btn.style.display = 'none';
+                }
+            });
+        };
+
+        hideNativeSkipButtons();
+
+        // SpotifyPlayer re-renders its internals on progress/track updates,
+        // so keep re-hiding whenever the DOM inside the wrapper changes.
+        const observer = new MutationObserver(hideNativeSkipButtons);
+        observer.observe(wrapper, { childList: true, subtree: true });
+
+        return () => observer.disconnect();
+    }, [activeTrackUris]);
+
 
     const updateRecommendationState = useCallback((data: RecommendationResponse) => {
         const nextSongs = data.songs || [];
