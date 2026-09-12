@@ -462,7 +462,7 @@ export default function DashboardPage() {
             <link rel="stylesheet" href="/css/dashboard.css" />
             <link rel="stylesheet" href="/css/player.css" />
 
-            <Navbar user={user} onLogout={() => void handleLogout()} />
+            <Navbar user={user} spotifyConnected={spotifyConnected} setSpotifyConnected = {setSpotifyConnected} onLogout={() => void handleLogout()} />
 
             <main className="dashboard-wrap container">
                 <WeatherCard
